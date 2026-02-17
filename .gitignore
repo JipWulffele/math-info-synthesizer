@@ -19,11 +19,11 @@
 # Testing
 test/*
 Testing/*
-.cache/
+.cache/*
 
 # Visual Studio Code
-.vscode/
-bin/
+.vscode/*
+bin/*
 
 # Make files
 Makefile
