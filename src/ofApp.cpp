@@ -122,6 +122,10 @@ void ofApp::cbAudioProcess(ofSoundBuffer & buffer){
     // if formeOnde == 1, call calcul_carre to fill the buffer with a square wave
     // if formeOnde == 2, call calcul_scie to fill the buffer
 
+	// Add code for smooting frequency changes to avoid clicks here (optional)
+    // Placeholder : smooth f
+
+    // Main audio processing loop to fill the buffer with the appropriate waveform based on the value of formeOnde 
     for (unsigned int i = 0; i < buffer.getNumFrames(); i++){ // buffer.getNumFrames() is unsigned
     	float sample;
 
