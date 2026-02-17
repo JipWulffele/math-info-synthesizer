@@ -33,9 +33,9 @@ class ofApp : public ofBaseApp{
 		
 		
 		// Functions create and modify sound
-		void calc_sin(float A, float f, float t);
-		void calcul_carre(float A, float f, float t, float brillance);
-		void calcul_scie(float A, float f, float t, float brillance);
+		float calc_sin(float A, float f, float t);
+		float calcul_carre(float A, float f, float t, float brillance);
+		float calcul_scie(float A, float f, float t, float brillance);
         
 
 		// Variables for sound processing
@@ -46,7 +46,7 @@ class ofApp : public ofBaseApp{
 		float A; // Amplitude
 		float f; // Frequency
 		float t; // Time
-		float volume; // Volume
+		// float volume; // Just use amplitude ?
 
 		int formeOnde; // Waveform type (0, 1, 2)
 		float brillance; // Brightness of the sound

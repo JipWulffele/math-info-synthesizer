@@ -7,7 +7,14 @@ void ofApp::setup(){
 	
 	bufferSize	= 512;
 	sampleRate 	= 44100;
-	volume		= 0.1f;
+	//volume		= 0.1f;
+
+	// Initialize sound parameters
+	A = 0.5f; // Amplitude
+	f = 440.0f; // Frequency (440 Hz is the standard A note)
+	t = 0.0f; // Time
+	formeOnde = 0; // Start with sine wave
+	brillance = 0.5f; // Medium brightness
 
     // initialize a audio buffer
 	audioBuffer.assign(bufferSize, 0.0);
@@ -108,26 +115,41 @@ void ofApp::audioOut(ofSoundBuffer & buffer){
 
 //--------------------------------------------------------------
 void ofApp::cbAudioProcess(ofSoundBuffer & buffer){
-   // Use 'volume' to control the overall volume of the sound (-> Amplitude)
+   // Use 'A' to control the overall volume of the sound
    // Use 'f' to control the frequency of the sine wave
 
    // if formeOnde == 0, call calc_sin to fill the buffer with a sine wave
    // if formeOnde == 1, call calcul_carre to fill the buffer with a square wave
    // if formeOnde == 2, call calcul_scie to fill the buffer
+
+   for (size_t i = 0; i < buffer.getNumFrames(); i++){
+       float sample;
+
+       // Placeholder: generate a sine wave sample
+	   sample = calc_sin(A, f, t);
+
+	   // Fill the buffer with the generated sample (same for left and right channels for mono output)
+       buffer[i*buffer.getNumChannels() + 0] = sample; // LEFT channel
+	   buffer[i*buffer.getNumChannels() + 1] = sample; // RIGHT channel (same as left for mono output)
+       t += 1.0f / sampleRate;
+   }
 }
 
 
 //--------------------------------------------------------------
-void ofApp::calc_sin(float A, float f, float t){
-    // Fill the buffer with a sine wave of amplitude A, frequency f, and time t
+float ofApp::calc_sin(float A, float f, float t){
+    // Calculate the sine wave value for each sample in the buffer and fill the buffer with it
+	return A * sin(2 * PI * f * t);
 }
 
 //--------------------------------------------------------------
-void ofApp::calcul_carre(float A, float f, float t, float brillance){
+float ofApp::calcul_carre(float A, float f, float t, float brillance){
     // Fill the buffer with a square wave of amplitude A, frequency f, time t, and brightness brillance
+	return 0.0f; // Placeholder
 }
 
 //--------------------------------------------------------------
-void ofApp::calcul_scie(float A, float f, float t, float brillance){
+float ofApp::calcul_scie(float A, float f, float t, float brillance){
     // Fill the buffer with a sawtooth wave of amplitude A, frequency f, time t, and brightness brillance
+	return 0.0f; // Placeholder
 }
