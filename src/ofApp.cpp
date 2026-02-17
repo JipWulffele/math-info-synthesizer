@@ -74,6 +74,8 @@ void ofApp::draw(){
 		ofPopMatrix();
 	ofPopStyle();
 
+
+	// Add Fourier transform visualization here (optional)
 }
 
 //--------------------------------------------------------------
@@ -158,3 +160,5 @@ float ofApp::calcul_scie(float A, float f, float t, float brillance){
     // Calculate the sawtooth wave value for the given amplitude A, frequency f, time t, and brightness brillance
 	return 0.0f; // Placeholder
 }
+
+// Add fourier transform function here (optional)
