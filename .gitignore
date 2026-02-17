@@ -1,0 +1,22 @@
+# Prerequisites
+*.d
+
+# Compiled Object files
+*.slo
+*.lo
+*.o
+*.obj
+
+# Temporary files
+*.tmp 
+*.log 
+*.bak 
+*.swp 
+
+# env variables
+.env
+
+# Testing
+test/*
+Testing/*
+.cache/
