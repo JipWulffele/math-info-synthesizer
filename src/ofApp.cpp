@@ -79,3 +79,8 @@ void ofApp::gotMessage(ofMessage msg){
 void ofApp::dragEvent(ofDragInfo dragInfo){ 
 
 }
+
+//--------------------------------------------------------------
+void ofApp::cbAudioProcess(ofSoundBuffer & buffer){
+   // Call calc_sin to fill the buffer with a sine wave 
+}
