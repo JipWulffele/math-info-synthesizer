@@ -106,7 +106,7 @@ void ofApp::audioOut(ofSoundBuffer & buffer){
     cbAudioProcess(buffer);
 
 	// Copy the processed audio data to audioBuffer for visualization in the draw() function
-	for (size_t i = 0; i < buffer.getNumFrames(); i++){
+	for (size_t i = 0; i < buffer.getNumFrames(); i++){ // buffer.getNumFrames() is unsigned so use size_t and not int
 		audioBuffer[i] = buffer.getSample(i, 0); // Mono output, so we take the first channel
 	}
 }
@@ -122,7 +122,7 @@ void ofApp::cbAudioProcess(ofSoundBuffer & buffer){
     // if formeOnde == 1, call calcul_carre to fill the buffer with a square wave
     // if formeOnde == 2, call calcul_scie to fill the buffer
 
-    for (size_t i = 0; i < buffer.getNumFrames(); i++){
+    for (size_t i = 0; i < buffer.getNumFrames(); i++){ // buffer.getNumFrames() is unsigned so use size_t and not int
     	float sample;
 
         // Placeholder: generate a sine wave sample
