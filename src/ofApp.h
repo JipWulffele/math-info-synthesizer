@@ -31,6 +31,9 @@ class ofApp : public ofBaseApp{
 		void audioOut(ofSoundBuffer & buffer) override;
 		void cbAudioProcess(ofSoundBuffer & buffer);
 		
+		void computeFT(vector <float> & audio); // Function to compute Fourier transform 
+
+		// Functions to create and modify sound
 		
 		// Functions create and modify sound
 		float calc_sin(float A, float f, float t);
@@ -42,6 +45,8 @@ class ofApp : public ofBaseApp{
 		vector <float> audioBuffer; // Buffer to hold audio samples
         int sampleRate; // Sample rate for audio processing
 		int bufferSize; // Size of the audio buffer
+
+		vector <float> audioFT; // Buffer to hold Fourier transform data for visualization
 
 		float A; // Amplitude
 		float f; // Frequency
