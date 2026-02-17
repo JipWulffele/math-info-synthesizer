@@ -90,8 +90,8 @@ void ofApp::draw(){
 		ofSetLineWidth(3);
 					
 			ofBeginShape();
-			for (unsigned int i = 0; i < audioFT.size(); i++){
-				float x =  ofMap(i, 0, audioFT.size(), 0, 900, true);
+			for (unsigned int i = 0; i < audioFT.size()/2; i++){
+				float x =  ofMap(i, 0, audioFT.size()/2, 0, 900, true);
 				ofVertex(x, 180 - audioFT[i]*600.0f);
 			}
 			ofEndShape(false);
