@@ -7,7 +7,6 @@ void ofApp::setup(){
 	
 	bufferSize	= 512;
 	sampleRate 	= 44100;
-	//volume		= 0.1f;
 
 	// Initialize sound parameters
 	A = 0.5f; // Amplitude
@@ -44,7 +43,7 @@ void ofApp::update(){
 
 //--------------------------------------------------------------
 void ofApp::draw(){
-    // Draw current state of audiobuffer on the screen (e.g. as a waveform)
+    // Draw current state of audiobuffer on the screen
 
     ofSetColor(225);
 	ofDrawBitmapString("AUDIO OUTPUT", 32, 32);
@@ -112,44 +111,46 @@ void ofApp::audioOut(ofSoundBuffer & buffer){
 	}
 }
 
-
 //--------------------------------------------------------------
 void ofApp::cbAudioProcess(ofSoundBuffer & buffer){
-   // Use 'A' to control the overall volume of the sound
-   // Use 'f' to control the frequency of the sine wave
+    // Fill the buffer with a sound
 
-   // if formeOnde == 0, call calc_sin to fill the buffer with a sine wave
-   // if formeOnde == 1, call calcul_carre to fill the buffer with a square wave
-   // if formeOnde == 2, call calcul_scie to fill the buffer
+    // Use 'A' to control the overall volume of the sound
+    // Use 'f' to control the frequency of the sine wave
 
-   for (size_t i = 0; i < buffer.getNumFrames(); i++){
-       float sample;
+    // if formeOnde == 0, call calc_sin to fill the buffer with a sine wave
+    // if formeOnde == 1, call calcul_carre to fill the buffer with a square wave
+    // if formeOnde == 2, call calcul_scie to fill the buffer
 
-       // Placeholder: generate a sine wave sample
-	   sample = calc_sin(A, f, t);
+    for (size_t i = 0; i < buffer.getNumFrames(); i++){
+    	float sample;
 
-	   // Fill the buffer with the generated sample (same for left and right channels for mono output)
-       buffer[i*buffer.getNumChannels() + 0] = sample; // LEFT channel
-	   buffer[i*buffer.getNumChannels() + 1] = sample; // RIGHT channel (same as left for mono output)
-       t += 1.0f / sampleRate;
+        // Placeholder: generate a sine wave sample
+	    // Replace with the appropriate function call based on the value of formeOnde
+	    sample = calc_sin(A, f, t);
+
+	    // Fill the buffer with the generated sample (same for left and right channels for mono output)
+        buffer[i*buffer.getNumChannels() + 0] = sample; // Left channel
+	    buffer[i*buffer.getNumChannels() + 1] = sample; // Right channel (same as left for mono output)
+        t += 1.0f / sampleRate;
    }
 }
 
 
 //--------------------------------------------------------------
 float ofApp::calc_sin(float A, float f, float t){
-    // Calculate the sine wave value for each sample in the buffer and fill the buffer with it
+    // Calculate the sine wave value for the given amplitude A, frequency f, and time t
 	return A * sin(2 * PI * f * t);
 }
 
 //--------------------------------------------------------------
 float ofApp::calcul_carre(float A, float f, float t, float brillance){
-    // Fill the buffer with a square wave of amplitude A, frequency f, time t, and brightness brillance
+    // Calculate the square wave value for the given amplitude A, frequency f, time t, and brightness brillance
 	return 0.0f; // Placeholder
 }
 
 //--------------------------------------------------------------
 float ofApp::calcul_scie(float A, float f, float t, float brillance){
-    // Fill the buffer with a sawtooth wave of amplitude A, frequency f, time t, and brightness brillance
+    // Calculate the sawtooth wave value for the given amplitude A, frequency f, time t, and brightness brillance
 	return 0.0f; // Placeholder
 }
