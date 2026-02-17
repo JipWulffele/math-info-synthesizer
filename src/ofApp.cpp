@@ -17,6 +17,7 @@ void ofApp::setup(){
 
     // initialize a audio buffer
 	audioBuffer.assign(bufferSize, 0.0);
+	audioFT.assign(bufferSize, 0.0); // Placeholder for Fourier transform buffer
 
     // Setup device and stream
     soundStream.printDeviceList();
@@ -74,8 +75,29 @@ void ofApp::draw(){
 		ofPopMatrix();
 	ofPopStyle();
 
-
 	// Add Fourier transform visualization here (optional)
+	ofPushStyle();
+		ofPushMatrix();
+		ofTranslate(32, 350, 0);
+			
+		ofSetColor(225);
+		ofDrawBitmapString("Fourier Transform", 4, 18);
+		
+		ofSetLineWidth(1);	
+		ofDrawRectangle(0, 0, 900, 200);
+
+		ofSetColor(58, 135, 245);
+		ofSetLineWidth(3);
+					
+			ofBeginShape();
+			for (unsigned int i = 0; i < audioFT.size()/2; i++){
+				float x =  ofMap(i, 0, audioFT.size()/2, 0, 900, true);
+				ofVertex(x, 180 - audioFT[i]*600.0f);
+			}
+			ofEndShape(false);
+			
+		ofPopMatrix();
+	ofPopStyle();
 }
 
 //--------------------------------------------------------------
@@ -106,6 +128,9 @@ void ofApp::mouseMoved(int x, int y ){
 void ofApp::audioOut(ofSoundBuffer & buffer){
     // Call cbAudioProcess to fill the buffer with sound data
     cbAudioProcess(buffer);
+
+	// Compute the Fourier transform of the audio buffer for visualization (optional)
+	computeFT(audioBuffer);
 
 	// Copy the processed audio data to audioBuffer for visualization in the draw() function
 	for (unsigned int i = 0; i < buffer.getNumFrames(); i++){ // buffer.getNumFrames() is unsigned
@@ -162,3 +187,24 @@ float ofApp::calcul_scie(float A, float f, float t, float brillance){
 }
 
 // Add fourier transform function here (optional)
+void ofApp::computeFT(vector <float> & audio){
+	// Compute the Fourier transform of the audio buffer and store the result in fourierBuffer for visualization
+	
+	int n = audio.size(); // Number of samples in the audio buffer
+
+	// Compute the real and imaginary parts of the fourier transform
+	float realPart[n], imagPart[n]; // Array to hold the real and imaginary parts of the fourier transform
+
+	// Compute the fourier transform using the DFT formula
+	for (int k = 0; k < n; k++) { // For each output
+		realPart[k] = 0;
+		imagPart[k] = 0;
+		for (int t = 0; t < n; t++) { // For each input
+			float angle = (2 * PI * t * k) / n;
+			realPart[k] += audio[t] * cos(angle);
+			imagPart[k] -= audio[t] * sin(angle); // Negative sign for the imaginary part
+		}
+		// Calculate FT magnitude and normalize by n
+		audioFT[k] = sqrt(realPart[k] * realPart[k] + imagPart[k] * imagPart[k]) / n;
+	}
+}
