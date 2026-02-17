@@ -8,13 +8,6 @@ void ofApp::setup(){
 	bufferSize	= 512;
 	sampleRate 	= 44100;
 
-	// Initialize sound parameters
-	A = 0.5f; // Amplitude
-	f = 440.0f; // Frequency (440 Hz is the standard A note)
-	t = 0.0f; // Time
-	formeOnde = 0; // Start with sine wave
-	brillance = 0.5f; // Medium brightness
-
     // initialize a audio buffer
 	audioBuffer.assign(bufferSize, 0.0);
 	audioFT.assign(bufferSize, 0.0); // Placeholder for Fourier transform buffer
@@ -140,41 +133,9 @@ void ofApp::audioOut(ofSoundBuffer & buffer){
 
 //--------------------------------------------------------------
 void ofApp::cbAudioProcess(ofSoundBuffer & buffer){
-    // Fill the buffer with a sound
     
-	// Add code for smooting frequency changes to avoid clicks here (optional)
-    // Placeholder : smooth f
-
-    // Main audio processing loop to fill the buffer with the appropriate waveform based on the value of formeOnde 
-    for (unsigned int i = 0; i < buffer.getNumFrames(); i++){ // buffer.getNumFrames() is unsigned
-    	float sample;
-
-	    sample = oscilator::get_signal(A, f, t, formeOnde, brillance);
-
-	    // Fill the buffer with the generated sample (same for left and right channels for mono output)
-        buffer[i*buffer.getNumChannels() + 0] = sample; // Left channel
-	    buffer[i*buffer.getNumChannels() + 1] = sample; // Right channel (same as left for mono output)
-        t += 1.0f / sampleRate;
-   }
-}
-
-
-//--------------------------------------------------------------
-float ofApp::calc_sin(float A, float f, float t){
-    // Calculate the sine wave value for the given amplitude A, frequency f, and time t
-	return A * sin(2 * PI * f * t);
-}
-
-//--------------------------------------------------------------
-float ofApp::calcul_carre(float A, float f, float t, float brillance){
-    // Calculate the square wave value for the given amplitude A, frequency f, time t, and brightness brillance
-	return 0.0f; // Placeholder
-}
-
-//--------------------------------------------------------------
-float ofApp::calcul_scie(float A, float f, float t, float brillance){
-    // Calculate the sawtooth wave value for the given amplitude A, frequency f, time t, and brightness brillance
-	return 0.0f; // Placeholder
+	// Use the oscilator instance to generate the sound signal based on the current parameters
+	myOscilator.get_signal(buffer, buffer.getNumFrames());
 }
 
 // Add fourier transform function here (optional)
