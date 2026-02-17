@@ -141,14 +141,7 @@ void ofApp::audioOut(ofSoundBuffer & buffer){
 //--------------------------------------------------------------
 void ofApp::cbAudioProcess(ofSoundBuffer & buffer){
     // Fill the buffer with a sound
-
-    // Use 'A' to control the overall volume of the sound
-    // Use 'f' to control the frequency of the sine wave
-
-    // if formeOnde == 0, call calc_sin to fill the buffer with a sine wave
-    // if formeOnde == 1, call calcul_carre to fill the buffer with a square wave
-    // if formeOnde == 2, call calcul_scie to fill the buffer
-
+    
 	// Add code for smooting frequency changes to avoid clicks here (optional)
     // Placeholder : smooth f
 
@@ -156,9 +149,7 @@ void ofApp::cbAudioProcess(ofSoundBuffer & buffer){
     for (unsigned int i = 0; i < buffer.getNumFrames(); i++){ // buffer.getNumFrames() is unsigned
     	float sample;
 
-        // Placeholder: generate a sine wave sample
-	    // Replace with the appropriate function call based on the value of formeOnde
-	    sample = calc_sin(A, f, t);
+	    sample = oscilator::get_signal(A, f, t, formeOnde, brillance);
 
 	    // Fill the buffer with the generated sample (same for left and right channels for mono output)
         buffer[i*buffer.getNumChannels() + 0] = sample; // Left channel
