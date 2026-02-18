@@ -18,6 +18,9 @@ class oscilator {
         void setBrillance(float brillance);
         
         void setSmoothingFactor(float factor); // Setter for smoothing factor (controls how quickly frequency changes; e.g., 0.05 for fast smoothing)
+        
+        bool getNoteOn() const;
+        void setNoteOn(bool value);
 
     private:
         // Attributes for the oscilator
@@ -26,6 +29,7 @@ class oscilator {
         float t; // Time
         int formeOnde; // Waveform type (0, 1, 2)
         float b; // Brightness of the sound
+        bool noteOn; // If there is an active note to play
 
         float sampleRate; // Sample rate for audio processing
 

@@ -12,6 +12,7 @@ oscilator::oscilator() {
     t = 0.0f; // Time (no longer used ?)
     formeOnde = 0; // Start with sine wave
     b = 4.0f; // Medium brightness
+    noteOn = false; // No active note (no sound to generate)
     
     sampleRate = 44100.0f; // Standard sample rate for audio processing
     
@@ -42,6 +43,8 @@ float oscilator::getBrillance() const { return b; }
 void oscilator::setBrillance(float brillance) { b = brillance; }
 
 void oscilator::setSmoothingFactor(float factor) { smoothingFactor = factor; }
+bool oscilator::getNoteOn() const { return noteOn; }
+void oscilator::setNoteOn(bool value) { noteOn = value; }
 
 //--------------------------------------------------------------
 void  oscilator::get_signal(ofSoundBuffer & buffer, int n){
@@ -50,22 +53,24 @@ void  oscilator::get_signal(ofSoundBuffer & buffer, int n){
     phaseAdder = (1 - smoothingFactor) * phaseAdder + smoothingFactor * phaseAdderTarget;
 
     // Generate the signal based on the current waveform type (formeOnde) and fill the buffer
-    switch (formeOnde) {
-        case 0: // if formeOnde == 0, call calc_sin to fill the buffer with a sine wave
-            calc_sin(buffer, n);
-            break;
-        case 1: // if formeOnde == 1, call calcul_carre to fill the buffer with a square wave
-            calcul_carre(buffer, n);
-            break;
-        case 2: // if formeOnde == 2, call calcul_scie to fill the buffer
-            calcul_scie(buffer, n);
-            break;
-        default:    
-            for (int i = 0; i < n; i++) {
-                buffer[i] = 0.0f;
-            }
-            break;
-    };
+    if (noteOn) {
+        switch (formeOnde) {
+            case 0: // if formeOnde == 0, call calc_sin to fill the buffer with a sine wave
+                calc_sin(buffer, n);
+                break;
+            case 1: // if formeOnde == 1, call calcul_carre to fill the buffer with a square wave
+                calcul_carre(buffer, n);
+                break;
+            case 2: // if formeOnde == 2, call calcul_scie to fill the buffer
+                calcul_scie(buffer, n);
+                break;
+            default:    
+                for (int i = 0; i < n; i++) {
+                    buffer[i] = 0.0f;
+                }
+                break;
+        }
+    }
 
 }
 
