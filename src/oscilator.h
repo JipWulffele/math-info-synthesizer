@@ -12,13 +12,21 @@ class oscilator {
         void setAmplitude(float amplitude); // Clamped to [0, 1]
         float getFrequency() const;
         void setFrequency(float frequency); // Clamped to [20, 20000] Hz
-        float getMorphingFactor() const;
-        void setMorphingFactor(float morph); // Clamped to [0, 1]; 0=sine, 0.5=square, 1=sawtooth
         float getBrillance() const;
         void setBrillance(float brillance); // Clamped to [1, 32]
         
+        // Waveform amplitude getters/setters
+        float getAmpSine() const;
+        void setAmpSine(float amp); // Clamped to [0, 1]
+        float getAmpSquare() const;
+        void setAmpSquare(float amp); // Clamped to [0, 1]
+        float getAmpSawtooth() const;
+        void setAmpSawtooth(float amp); // Clamped to [0, 1]
+        float getAmpTriangle() const;
+        void setAmpTriangle(float amp); // Clamped to [0, 1]
+        
         void setSmoothingFactor(float factor); // Setter for frequency smoothing (default 0.05)
-        void setMorphSmoothing(float factor); // Setter for morphing smoothing (default 0.05)
+        void setWaveformSmoothing(float factor); // Setter for waveform amplitude smoothing (default 0.05)
         
         bool getNoteOn() const;
         void setNoteOn(bool value);
@@ -28,11 +36,15 @@ class oscilator {
         float A; // Amplitude [0, 1]
         float f; // Frequency [20, 20000] Hz
         float t; // Time (legacy, kept for compatibility)
-        float morphingFactor; // Waveform morphing [0, 1]: 0=sine, 0.5=square, 1=sawtooth
-        float morphTargetFactor; // Target morphing factor for smooth transitions
-        float morphSmoothing; // Smoothing factor for morphing transitions (e.g., 0.05)
         float b; // Brightness/Brillance [1, 32]
         bool noteOn; // If there is an active note to play
+        
+        // Waveform amplitude attributes
+        float ampSine, ampSineTarget; // Sine amplitude [0, 1]
+        float ampSquare, ampSquareTarget; // Square amplitude [0, 1]
+        float ampSawtooth, ampSawtoothTarget; // Sawtooth amplitude [0, 1]
+        float ampTriangle, ampTriangleTarget; // Triangle amplitude [0, 1]
+        float waveformSmoothing; // Smoothing factor for waveform amplitude transitions (default 0.05)
 
         float sampleRate; // Sample rate for audio processing
 

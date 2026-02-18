@@ -50,6 +50,12 @@ class ofApp : public ofBaseApp{
 		ofxFloatSlider amplitudeSliderGui;
 		ofxFloatSlider frequencesGui;
 		ofxToggle mouseToggleGui;
+		
+		// Waveform amplitude sliders
+		ofxFloatSlider ampSineGui;
+		ofxFloatSlider ampSquareGui;
+		ofxFloatSlider ampSawtoothGui;
+		ofxFloatSlider ampTriangleGui;
 	
 
 };
