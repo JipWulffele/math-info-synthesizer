@@ -39,9 +39,9 @@ class ofApp : public ofBaseApp{
 		// Gestion clavier
 		bool noteOn = false ;
 		std::string currentNote; // nom de la note actuellement pressée
-		
-		// Oscilator instance
-		oscilator myOscilator;
+
+		// setup keyboard -> 1 oscilator by note stored in oscillators
+		std::array<oscilator, 12> oscillators;
 
 		// GUI
     	ofxPanel gui;

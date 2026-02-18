@@ -71,14 +71,14 @@ void  oscilator::get_signal(ofSoundBuffer & buffer, int n){
     // Generate the blended signal and fill the buffer
     if (noteOn) {
         generateBlendedSamples(buffer, n);
-    } else {
+    } 
+    else {
         // Silence when noteOn is false
         for (int i = 0; i < n; i++) {
             buffer[i*buffer.getNumChannels() + 0] = 0.0f;
             buffer[i*buffer.getNumChannels() + 1] = 0.0f;
         }
     }
-
 }
 
 //--------------------------------------------------------------
