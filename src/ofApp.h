@@ -35,6 +35,10 @@ class ofApp : public ofBaseApp{
 		// Sound stream and buffer
 		ofSoundStream soundStream;
 		ofSoundBuffer soundBuffer;
+
+		// Gestion clavier
+		bool noteOn = false ;
+		std::string currentNote; // nom de la note actuellement pressée
 		
 		// Oscilator instance
 		oscilator myOscilator;
