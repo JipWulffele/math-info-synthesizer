@@ -61,7 +61,7 @@ void ofApp::draw(){
 			ofBeginShape();
 			for (unsigned int i = 0; i < audioBuffer.size(); i++){
 				float x =  ofMap(i, 0, audioBuffer.size(), 0, 900, true);
-				ofVertex(x, 100 -audioBuffer[i]*180.0f);
+				ofVertex(x, 100 -audioBuffer[i]*90.0f);
 			}
 			ofEndShape(false);
 			
@@ -85,7 +85,7 @@ void ofApp::draw(){
 			ofBeginShape();
 			for (unsigned int i = 0; i < audioFT.size()/2; i++){
 				float x =  ofMap(i, 0, audioFT.size()/2, 0, 900, true);
-				ofVertex(x, 180 - audioFT[i]*600.0f);
+				ofVertex(x, 180 - audioFT[i]*300.0f);
 			}
 			ofEndShape(false);
 			
