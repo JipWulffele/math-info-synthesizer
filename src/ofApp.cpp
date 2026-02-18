@@ -41,8 +41,17 @@ void ofApp::draw(){
 
     ofSetColor(225);
 	ofDrawBitmapString("AUDIO OUTPUT", 32, 32);
-	ofDrawBitmapString("press 'o' to change waveform\npress 'b' to change the brillance", 31, 92);
-	
+	ofDrawBitmapString("press '1' to change waveform to sinusoide, '2' to square and '3' to sawtooth", 31, 62);
+
+	// Indiquer la forme d'onde actuelle
+	std::string waveName;
+	if(myOscilator.getFormeOnde() == 0) waveName = "sinusoide";
+	else if(myOscilator.getFormeOnde() == 1) waveName = "square";
+	else if(myOscilator.getFormeOnde() == 2) waveName = "sawtooth";
+
+	ofDrawBitmapString("Current waveform: " + waveName, 32, 92);
+	ofDrawBitmapString("Current musical note: " + currentNote, 32, 122);
+
 	ofNoFill();
 	
 	ofPushStyle();
@@ -103,10 +112,49 @@ void ofApp::keyPressed(int key){
     // Use the 'o' key to change the formOnde (0, 1, 2)
     // Use the 'b' key to change the brillance
 
+	float laFreq = 440.0f;
+	int demiTon = 0;
+	bool notePressed = false;
+
+	// Gestion clavier musical
+    if(key == 'w')      { demiTon = -9; notePressed = true; currentNote = "Do"; }
+    else if(key == 's') { demiTon = -8; notePressed = true; currentNote = "Do#"; }
+    else if(key == 'x') { demiTon = -7; notePressed = true; currentNote = "Re"; }
+    else if(key == 'd') { demiTon = -6; notePressed = true; currentNote = "Re#"; }
+    else if(key == 'c') { demiTon = -5; notePressed = true; currentNote = "Mi"; }
+    else if(key == 'v') { demiTon = -4; notePressed = true; currentNote = "Fa"; }
+    else if(key == 'g') { demiTon = -3; notePressed = true; currentNote = "Fa#"; }
+    else if(key == 'b') { demiTon = -2; notePressed = true; currentNote = "Sol"; }
+    else if(key == 'h') { demiTon = -1; notePressed = true; currentNote = "Sol#"; }
+    else if(key == 'n') { demiTon = 0;  notePressed = true; currentNote = "La"; }
+    else if(key == 'j') { demiTon = 1;  notePressed = true; currentNote = "La#"; }
+    else if(key == ',') { demiTon = 2;  notePressed = true; currentNote = "Si"; }
+
+	//Gestion forme d'onde
+	else if (key == 49) myOscilator.setFormeOnde(0); // sinusoide numpad_1
+	else if (key == 50) myOscilator.setFormeOnde(1); // carré numpad_2
+	else if (key == 51) myOscilator.setFormeOnde(2); // dent de scie numpad_3
+
+	if (notePressed) {
+		noteOn = true;
+		myOscilator.setFrequency(laFreq * std::pow(2.0f, demiTon / 12.0f)) ;
+	}
 }
 
 //--------------------------------------------------------------
 void ofApp::keyReleased(int key){
+	if (key == 'w')     {noteOn = false; currentNote = "";}
+	else if(key == 's') {noteOn = false; currentNote = "";}
+	else if(key == 'x') {noteOn = false; currentNote = "";}
+	else if(key == 'd') {noteOn = false; currentNote = "";}
+	else if(key == 'c') {noteOn = false; currentNote = "";}
+	else if(key == 'v') {noteOn = false; currentNote = "";}
+	else if(key == 'g') {noteOn = false; currentNote = "";}
+	else if(key == 'b') {noteOn = false; currentNote = "";}
+	else if(key == 'h') {noteOn = false; currentNote = "";}
+	else if(key == 'n') {noteOn = false; currentNote = "";}
+	else if(key == 'j') {noteOn = false; currentNote = "";}
+	else if(key == ',') {noteOn = false; currentNote = "";}
 
 }
 
@@ -138,6 +186,7 @@ void ofApp::cbAudioProcess(ofSoundBuffer & buffer){
 	myOscilator.get_signal(buffer, buffer.getNumFrames());
 }
 
+//--------------------------------------------------------------
 // Add fourier transform function here (optional)
 void ofApp::computeFT(vector <float> & audio){
 	// Compute the Fourier transform of the audio buffer and store the result in fourierBuffer for visualization
