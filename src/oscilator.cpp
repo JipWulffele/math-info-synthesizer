@@ -8,8 +8,8 @@ oscilator::oscilator() {
     
     // Audio parameters
     A = 1.0f; // Amplitude
-    f = 440.0f; // Frequency (440 Hz is the standard A note
-    t = 0.0f; // Time
+    f = 440.0f; // Frequency (440 Hz is the standard A note)
+    t = 0.0f; // Time (no longer used ?)
     formeOnde = 0; // Start with sine wave
     b = 4.0f; // Medium brightness
     noteOn = false; // No active note (no sound to generate)
@@ -19,36 +19,49 @@ oscilator::oscilator() {
     // Parameters for phase calculation
     targetFrequency = f; // Initialize target frequency to the current frequency
     phase = 0.0f; // Initialize phase to zero
-    phaseAdder = 0.0f; // Initialize phase adder to zero
-    phaseAdderTarget = (f / sampleRate) * TWO_PI; // Calculate initial phase adder target based on the frequency and sample rate
+    phaseAdder = (f / sampleRate) * TWO_PI; // Initialize phase adder based on frequency
+    phaseAdderTarget = phaseAdder; // Initialize target to match 
+    smoothingFactor = 0.05f; // Smoothing factor for frequency transitions (0.05 = 5% towards target per get_signal call)
+
 }
 
 // Getters and Setters for the oscilator parameters 
 float oscilator::getAmplitude() const { return A; }
 void oscilator::setAmplitude(float amplitude) { A = amplitude; }
+
 float oscilator::getFrequency() const { return f; }
-void oscilator::setFrequency(float frequency) { f = frequency; }
+void oscilator::setFrequency(float frequency) { 
+    f = frequency; 
+    targetFrequency = frequency; // Update target frequency
+    phaseAdderTarget = (frequency / sampleRate) * TWO_PI; // Recalculate target phase adder
+}
+
 int oscilator::getFormeOnde() const { return formeOnde; }
 void oscilator::setFormeOnde(int forme) { formeOnde = forme; }
+
 float oscilator::getBrillance() const { return b; }
 void oscilator::setBrillance(float brillance) { b = brillance; }
+
+void oscilator::setSmoothingFactor(float factor) { smoothingFactor = factor; }
 bool oscilator::getNoteOn() const { return noteOn; }
 void oscilator::setNoteOn(bool value) { noteOn = value; }
 
 //--------------------------------------------------------------
 void  oscilator::get_signal(ofSoundBuffer & buffer, int n){
-    // if formeOnde == 0, call calc_sin to fill the buffer with a sine wave
-    // if formeOnde == 1, call calcul_carre to fill the buffer with a square wave
-    // if formeOnde == 2, call calcul_scie to fill the buffer
+
+    // Smooth phaseAdder towards phaseAdderTarget for frequency transitions
+    phaseAdder = (1 - smoothingFactor) * phaseAdder + smoothingFactor * phaseAdderTarget;
+
+    // Generate the signal based on the current waveform type (formeOnde) and fill the buffer
     if (noteOn) {
         switch (formeOnde) {
-            case 0:
+            case 0: // if formeOnde == 0, call calc_sin to fill the buffer with a sine wave
                 calc_sin(buffer, n);
                 break;
-            case 1:
+            case 1: // if formeOnde == 1, call calcul_carre to fill the buffer with a square wave
                 calcul_carre(buffer, n);
                 break;
-            case 2:
+            case 2: // if formeOnde == 2, call calcul_scie to fill the buffer
                 calcul_scie(buffer, n);
                 break;
             default:    
@@ -56,8 +69,8 @@ void  oscilator::get_signal(ofSoundBuffer & buffer, int n){
                     buffer[i] = 0.0f;
                 }
                 break;
-        };
-    };
+        }
+    }
 
 }
 
@@ -67,12 +80,12 @@ void oscilator::calc_sin(ofSoundBuffer & buffer, int n){
     for (int i = 0; i < n; i++){
     	
         float sample;
-	    sample = A * sin(2 * M_PI * f * t);
+	    sample = A * sin(phase);
         
         // Fill the buffer with the generated sample (same for left and right channels for mono output)
         buffer[i*buffer.getNumChannels() + 0] = sample; // Left channel
 	    buffer[i*buffer.getNumChannels() + 1] = sample; // Right channel (same as left for mono output)
-        t += 1.0f / sampleRate;
+        phase += phaseAdder;
    }
 
 }
@@ -84,7 +97,7 @@ void oscilator::calcul_carre(ofSoundBuffer & buffer, int n){
     	
         float sample = 0;
 	    for (int k=0; k <= b; k++){
-            sample += sin((2 * k + 1) * 2 * PI * f * t ) / (2 * k + 1);
+            sample += sin((2 * k + 1) * phase) / (2 * k + 1);
         }
         sample *= (4 / PI);
         sample *= A; // Scale by amplitude
@@ -93,7 +106,7 @@ void oscilator::calcul_carre(ofSoundBuffer & buffer, int n){
         // Fill the buffer with the generated sample (same for left and right channels for mono output)
         buffer[i*buffer.getNumChannels() + 0] = sample; // Left channel
 	    buffer[i*buffer.getNumChannels() + 1] = sample; // Right channel (same as left for mono output)
-        t += 1.0f / sampleRate;
+        phase += phaseAdder;
    }
 
 }
@@ -105,7 +118,7 @@ void oscilator::calcul_scie(ofSoundBuffer & buffer, int n){
     	
         float sample = 0;
 	    for (int k=1; k <= b+1; k++){
-            sample += pow(-1, k) * sin(2 * k * PI * f * t ) / (k);
+            sample += pow(-1, k) * sin(k * phase) / (k);
         }
         sample *= (2 / PI);
         sample *= A; // Scale by amplitude
@@ -114,7 +127,7 @@ void oscilator::calcul_scie(ofSoundBuffer & buffer, int n){
         // Fill the buffer with the generated sample (same for left and right channels for mono output)
         buffer[i*buffer.getNumChannels() + 0] = sample; // Left channel
 	    buffer[i*buffer.getNumChannels() + 1] = sample; // Right channel (same as left for mono output)
-        t += 1.0f / sampleRate;
+        phase += phaseAdder;
    }
 
 }
