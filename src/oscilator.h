@@ -16,7 +16,8 @@ class oscilator {
         void setFormeOnde(int forme);
         float getBrillance() const;
         void setBrillance(float brillance);
-
+        bool getNoteOn() const;
+        void setNoteOn(bool value);
 
     private:
         // Attributes for the oscilator
@@ -25,6 +26,7 @@ class oscilator {
         float t; // Time
         int formeOnde; // Waveform type (0, 1, 2)
         float b; // Brightness of the sound
+        bool noteOn; // If there is an active note to play
 
         float sampleRate; // Sample rate for audio processing
 
