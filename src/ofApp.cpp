@@ -58,8 +58,6 @@ void ofApp::draw(){
 	ofDrawBitmapString("Current waveform: " + waveName, 32, 92);
 	ofDrawBitmapString("Current musical note: " + currentNote, 32, 122);
 
-	ofDrawBitmapString("press 'o' to change waveform\npress 'b' to change the brillance", 31, 92);
-
 	ofNoFill();
 	
 	ofPushStyle();
