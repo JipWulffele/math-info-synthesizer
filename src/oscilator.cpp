@@ -11,7 +11,7 @@ oscilator::oscilator() {
     f = 440.0f; // Frequency (440 Hz is the standard A note
     t = 0.0f; // Time
     formeOnde = 0; // Start with sine wave
-    b = 1.0f; // Medium brightness
+    b = 4.0f; // Medium brightness
     
     sampleRate = 44100.0f; // Standard sample rate for audio processing
     
