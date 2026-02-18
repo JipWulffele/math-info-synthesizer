@@ -45,9 +45,9 @@ void ofApp::draw(){
 
 	// Indiquer la forme d'onde actuelle
 	std::string waveName;
-	if(formeOnde == 0) waveName = "sinusoide";
-	else if(formeOnde == 1) waveName = "square";
-	else if(formeOnde == 2) waveName = "sawtooth";
+	if(myOscilator.getFormeOnde() == 0) waveName = "sinusoide";
+	else if(myOscilator.getFormeOnde() == 1) waveName = "square";
+	else if(myOscilator.getFormeOnde() == 2) waveName = "sawtooth";
 
 	ofDrawBitmapString("Current waveform: " + waveName, 32, 92);
 	ofDrawBitmapString("Current musical note: " + currentNote, 32, 122);
@@ -131,13 +131,13 @@ void ofApp::keyPressed(int key){
     else if(key == ',') { demiTon = 2;  notePressed = true; currentNote = "Si"; }
 
 	//Gestion forme d'onde
-	else if (key == 49) formeOnde = 0; // sinusoide numpad_1
-	else if (key == 50) formeOnde = 1; // carré numpad_2
-	else if (key == 51) formeOnde = 2; // dent de scie numpad_3
+	else if (key == 49) myOscilator.setFormeOnde(0); // sinusoide numpad_1
+	else if (key == 50) myOscilator.setFormeOnde(1); // carré numpad_2
+	else if (key == 51) myOscilator.setFormeOnde(2); // dent de scie numpad_3
 
 	if (notePressed) {
 		noteOn = true;
-		f = laFreq * std::pow(2.0f, demiTon / 12.0f);
+		myOscilator.setFrequency(laFreq * std::pow(2.0f, demiTon / 12.0f)) ;
 	}
 }
 
@@ -186,6 +186,7 @@ void ofApp::cbAudioProcess(ofSoundBuffer & buffer){
 	myOscilator.get_signal(buffer, buffer.getNumFrames());
 }
 
+//--------------------------------------------------------------
 // Add fourier transform function here (optional)
 void ofApp::computeFT(vector <float> & audio){
 	// Compute the Fourier transform of the audio buffer and store the result in fourierBuffer for visualization
