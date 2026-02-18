@@ -132,34 +132,36 @@ void ofApp::keyPressed(int key){
 	// bool notePressed = false;
 
 	// Gestion clavier musical
-    if(key == 'w') { oscillators[0].setNoteOn(true); currentNote = "Do"; frequencesGui = oscillators[0].getFrequency(); }
-    if(key == 's') { oscillators[1].setNoteOn(true); currentNote = "Do#"; frequencesGui = oscillators[1].getFrequency(); }
-    if(key == 'x') { oscillators[2].setNoteOn(true); currentNote = "Re"; frequencesGui = oscillators[2].getFrequency(); }
-    if(key == 'd') { oscillators[3].setNoteOn(true); currentNote = "Re#"; frequencesGui = oscillators[3].getFrequency(); }
-    if(key == 'c') { oscillators[4].setNoteOn(true); currentNote = "Mi"; frequencesGui = oscillators[4].getFrequency(); }
-    if(key == 'v') { oscillators[5].setNoteOn(true); currentNote = "Fa"; frequencesGui = oscillators[5].getFrequency(); }
-    if(key == 'g') { oscillators[6].setNoteOn(true); currentNote = "Fa#"; frequencesGui = oscillators[6].getFrequency(); }
-    if(key == 'b') { oscillators[7].setNoteOn(true); currentNote = "Sol"; frequencesGui = oscillators[7].getFrequency(); }
-    if(key == 'h') { oscillators[8].setNoteOn(true); currentNote = "Sol#"; frequencesGui = oscillators[8].getFrequency(); }
-    if(key == 'n') { oscillators[9].setNoteOn(true); currentNote = "La"; frequencesGui = oscillators[9].getFrequency(); }
-    if(key == 'j') { oscillators[10].setNoteOn(true); currentNote = "La#"; frequencesGui = oscillators[10].getFrequency(); }
-    if(key == ',') { oscillators[11].setNoteOn(true); currentNote = "Si"; frequencesGui = oscillators[11].getFrequency(); }
+    if(key == 'w') { oscillators[0].setNoteOn(true); }
+    if(key == 's') { oscillators[1].setNoteOn(true); }
+    if(key == 'x') { oscillators[2].setNoteOn(true); }
+    if(key == 'd') { oscillators[3].setNoteOn(true); }
+    if(key == 'c') { oscillators[4].setNoteOn(true); }
+    if(key == 'v') { oscillators[5].setNoteOn(true); }
+    if(key == 'g') { oscillators[6].setNoteOn(true); }
+    if(key == 'b') { oscillators[7].setNoteOn(true); }
+    if(key == 'h') { oscillators[8].setNoteOn(true); }
+    if(key == 'n') { oscillators[9].setNoteOn(true); }
+    if(key == 'j') { oscillators[10].setNoteOn(true); }
+    if(key == ',') { oscillators[11].setNoteOn(true); }
+	updateCurrentNotes();
 }
 
 //--------------------------------------------------------------
 void ofApp::keyReleased(int key){
-	if (key == 'w'){oscillators[0].setNoteOn(false); currentNote = "";}
-	if(key == 's') {oscillators[1].setNoteOn(false); currentNote = "";}
-	if(key == 'x') {oscillators[2].setNoteOn(false); currentNote = "";}
-	if(key == 'd') {oscillators[3].setNoteOn(false); currentNote = "";}
-	if(key == 'c') {oscillators[4].setNoteOn(false); currentNote = "";}
-	if(key == 'v') {oscillators[5].setNoteOn(false); currentNote = "";}
-	if(key == 'g') {oscillators[6].setNoteOn(false); currentNote = "";}
-	if(key == 'b') {oscillators[7].setNoteOn(false); currentNote = "";}
-	if(key == 'h') {oscillators[8].setNoteOn(false); currentNote = "";}
-	if(key == 'n') {oscillators[9].setNoteOn(false); currentNote = "";}
-	if(key == 'j') {oscillators[10].setNoteOn(false); currentNote = "";}
-	if(key == ',') {oscillators[11].setNoteOn(false); currentNote = "";}
+	if (key == 'w'){oscillators[0].setNoteOn(false); }
+	if(key == 's') {oscillators[1].setNoteOn(false); }
+	if(key == 'x') {oscillators[2].setNoteOn(false); }
+	if(key == 'd') {oscillators[3].setNoteOn(false); }
+	if(key == 'c') {oscillators[4].setNoteOn(false); }
+	if(key == 'v') {oscillators[5].setNoteOn(false); }
+	if(key == 'g') {oscillators[6].setNoteOn(false); }
+	if(key == 'b') {oscillators[7].setNoteOn(false); }
+	if(key == 'h') {oscillators[8].setNoteOn(false); }
+	if(key == 'n') {oscillators[9].setNoteOn(false); }
+	if(key == 'j') {oscillators[10].setNoteOn(false);}
+	if(key == ',') {oscillators[11].setNoteOn(false);}
+	updateCurrentNotes();
 }
 
 //--------------------------------------------------------------
@@ -249,4 +251,16 @@ void ofApp::computeFT(vector <float> & audio){
 		// Calculate FT magnitude and normalize by n
 		audioFT[k] = sqrt(realPart[k] * realPart[k] + imagPart[k] * imagPart[k]) / n;
 	}
+}
+
+//--------------------------------------------------------------
+void ofApp::updateCurrentNotes(){
+
+    currentNote = "";
+
+    for(int i = 0; i < oscillators.size(); i++){
+        if(oscillators[i].getNoteOn()){
+            currentNote += noteNames[i] + " ";
+        }
+    }
 }
