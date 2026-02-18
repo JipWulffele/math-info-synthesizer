@@ -7,28 +7,31 @@ class oscilator {
         // Main method: generate a signal based on the current parameters
         void get_signal(ofSoundBuffer & buffer, int n); 
         
-        // Getters and Setters
+        // Getters and Setters with bounds enforcement
         float getAmplitude() const;
-        void setAmplitude(float amplitude);
+        void setAmplitude(float amplitude); // Clamped to [0, 1]
         float getFrequency() const;
-        void setFrequency(float frequency);
-        int getFormeOnde() const;
-        void setFormeOnde(int forme);
+        void setFrequency(float frequency); // Clamped to [20, 20000] Hz
+        float getMorphingFactor() const;
+        void setMorphingFactor(float morph); // Clamped to [0, 1]; 0=sine, 0.5=square, 1=sawtooth
         float getBrillance() const;
-        void setBrillance(float brillance);
+        void setBrillance(float brillance); // Clamped to [1, 32]
         
-        void setSmoothingFactor(float factor); // Setter for smoothing factor (controls how quickly frequency changes; e.g., 0.05 for fast smoothing)
+        void setSmoothingFactor(float factor); // Setter for frequency smoothing (default 0.05)
+        void setMorphSmoothing(float factor); // Setter for morphing smoothing (default 0.05)
         
         bool getNoteOn() const;
         void setNoteOn(bool value);
 
     private:
         // Attributes for the oscilator
-        float A; // Amplitude
-        float f; // Frequency
-        float t; // Time
-        int formeOnde; // Waveform type (0, 1, 2)
-        float b; // Brightness of the sound
+        float A; // Amplitude [0, 1]
+        float f; // Frequency [20, 20000] Hz
+        float t; // Time (legacy, kept for compatibility)
+        float morphingFactor; // Waveform morphing [0, 1]: 0=sine, 0.5=square, 1=sawtooth
+        float morphTargetFactor; // Target morphing factor for smooth transitions
+        float morphSmoothing; // Smoothing factor for morphing transitions (e.g., 0.05)
+        float b; // Brightness/Brillance [1, 32]
         bool noteOn; // If there is an active note to play
 
         float sampleRate; // Sample rate for audio processing
@@ -38,10 +41,13 @@ class oscilator {
         float phase; // Current phase of the waveform
         float phaseAdder;
 		float phaseAdderTarget;
-        float smoothingFactor; // Smoothing factor for frequency transitions (e.g., 0.05 means 5% towards target per get_signal call)
+        float smoothingFactor; // Smoothing factor for frequency transitions
 
-        // Methods to generate different waveforms
-        void  calc_sin(ofSoundBuffer & buffer, int n);
-        void  calcul_carre(ofSoundBuffer & buffer, int n);
-        void  calcul_scie(ofSoundBuffer & buffer, int n);
+        // Methods to generate different waveforms (return sample value, not buffer)
+        float  calc_sin_sample();
+        float  calcul_carre_sample();
+        float  calcul_scie_sample();
+        
+        // Helper method for blended waveform generation
+        void generateBlendedSamples(ofSoundBuffer & buffer, int n);
 };

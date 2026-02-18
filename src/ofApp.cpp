@@ -41,15 +41,18 @@ void ofApp::draw(){
 
     ofSetColor(225);
 	ofDrawBitmapString("AUDIO OUTPUT", 32, 32);
-	ofDrawBitmapString("press '1' to change waveform to sinusoide, '2' to square and '3' to sawtooth", 31, 62);
+	ofDrawBitmapString("Move mouse left/right to morph waveform (sine → square → sawtooth)", 31, 62);
 
-	// Indiquer la forme d'onde actuelle
+	// Indiquer la forme d'onde actuelle and morphing factor
 	std::string waveName;
-	if(myOscilator.getFormeOnde() == 0) waveName = "sinusoide";
-	else if(myOscilator.getFormeOnde() == 1) waveName = "square";
-	else if(myOscilator.getFormeOnde() == 2) waveName = "sawtooth";
+	float morph = myOscilator.getMorphingFactor();
+	if(morph < 0.25f) waveName = "Sine to Square";
+	else if(morph < 0.5f) waveName = "Square (blend from Sine)";
+	else if(morph < 0.75f) waveName = "Square to Sawtooth";
+	else waveName = "Sawtooth (blend from Square)";
 
 	ofDrawBitmapString("Current waveform: " + waveName, 32, 92);
+	ofDrawBitmapString("Morphing factor: " + std::to_string(morph).substr(0, 4), 32, 107);
 	ofDrawBitmapString("Current musical note: " + currentNote, 32, 122);
 
 	ofNoFill();
@@ -130,11 +133,6 @@ void ofApp::keyPressed(int key){
     else if(key == 'j') { demiTon = 1;  notePressed = true; currentNote = "La#"; }
     else if(key == ',') { demiTon = 2;  notePressed = true; currentNote = "Si"; }
 
-	//Gestion forme d'onde
-	else if (key == 49) myOscilator.setFormeOnde(0); // sinusoide numpad_1
-	else if (key == 50) myOscilator.setFormeOnde(1); // carré numpad_2
-	else if (key == 51) myOscilator.setFormeOnde(2); // dent de scie numpad_3
-
 	if (notePressed) {
 		myOscilator.setNoteOn(true);
 		myOscilator.setFrequency(laFreq * std::pow(2.0f, demiTon / 12.0f)) ;
@@ -159,9 +157,10 @@ void ofApp::keyReleased(int key){
 
 //--------------------------------------------------------------
 void ofApp::mouseMoved(int x, int y ){
-    // Update mouseX and mouseY variables with the current mouse position
-    // Use these variables to control 'volume' and 'f' (frequency) of the sound
-
+    // Map mouseX (0 to ~900) to morphing factor (0 to 1)
+    // Left side = sine (0), middle = square (0.5), right side = sawtooth (1)
+    float morphFactor = ofMap(x, 0, 900, 0.0f, 1.0f, true);
+    myOscilator.setMorphingFactor(morphFactor);
 }
 
 //--------------------------------------------------------------

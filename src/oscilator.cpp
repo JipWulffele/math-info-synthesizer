@@ -7,11 +7,15 @@
 oscilator::oscilator() {
     
     // Audio parameters
-    A = 1.0f; // Amplitude
+    A = 1.0f; // Amplitude [0, 1]
     f = 440.0f; // Frequency (440 Hz is the standard A note)
-    t = 0.0f; // Time (no longer used ?)
-    formeOnde = 0; // Start with sine wave
-    b = 4.0f; // Medium brightness
+    t = 0.0f; // Time (legacy, kept for compatibility)
+
+    morphingFactor = 0.0f; // Start with sine wave
+    morphTargetFactor = 0.0f; // Target morphing factor
+    morphSmoothing = 0.05f; // Smoothing factor for morphing transitions
+    b = 4.0f; // Brillance [1, 32]
+    
     noteOn = false; // No active note (no sound to generate)
     
     sampleRate = 44100.0f; // Standard sample rate for audio processing
@@ -21,28 +25,40 @@ oscilator::oscilator() {
     phase = 0.0f; // Initialize phase to zero
     phaseAdder = (f / sampleRate) * TWO_PI; // Initialize phase adder based on frequency
     phaseAdderTarget = phaseAdder; // Initialize target to match 
-    smoothingFactor = 0.05f; // Smoothing factor for frequency transitions (0.05 = 5% towards target per get_signal call)
+    smoothingFactor = 0.05f; // Smoothing factor for frequency transitions
 
 }
 
-// Getters and Setters for the oscilator parameters 
+// Getters and Setters with bounds enforcement
 float oscilator::getAmplitude() const { return A; }
-void oscilator::setAmplitude(float amplitude) { A = amplitude; }
+void oscilator::setAmplitude(float amplitude) { 
+    // Clamp amplitude to [0, 1]
+    A = (amplitude < 0.0f) ? 0.0f : (amplitude > 1.0f) ? 1.0f : amplitude; 
+}
 
 float oscilator::getFrequency() const { return f; }
 void oscilator::setFrequency(float frequency) { 
-    f = frequency; 
-    targetFrequency = frequency; // Update target frequency
-    phaseAdderTarget = (frequency / sampleRate) * TWO_PI; // Recalculate target phase adder
+    // Clamp frequency to [20, 20000] Hz
+    float clamped = (frequency < 20.0f) ? 20.0f : (frequency > 20000.0f) ? 20000.0f : frequency;
+    f = clamped; 
+    targetFrequency = clamped;
+    phaseAdderTarget = (clamped / sampleRate) * TWO_PI;
 }
 
-int oscilator::getFormeOnde() const { return formeOnde; }
-void oscilator::setFormeOnde(int forme) { formeOnde = forme; }
+float oscilator::getMorphingFactor() const { return morphingFactor; }
+void oscilator::setMorphingFactor(float morph) { 
+    // Clamp morphing factor to [0, 1] and update target
+    morphTargetFactor = (morph < 0.0f) ? 0.0f : (morph > 1.0f) ? 1.0f : morph; 
+}
 
 float oscilator::getBrillance() const { return b; }
-void oscilator::setBrillance(float brillance) { b = brillance; }
+void oscilator::setBrillance(float brillance) { 
+    // Clamp brillance to [1, 32]
+    b = (brillance < 1.0f) ? 1.0f : (brillance > 32.0f) ? 32.0f : brillance; 
+}
 
 void oscilator::setSmoothingFactor(float factor) { smoothingFactor = factor; }
+void oscilator::setMorphSmoothing(float factor) { morphSmoothing = factor; }
 bool oscilator::getNoteOn() const { return noteOn; }
 void oscilator::setNoteOn(bool value) { noteOn = value; }
 
@@ -51,83 +67,100 @@ void  oscilator::get_signal(ofSoundBuffer & buffer, int n){
 
     // Smooth phaseAdder towards phaseAdderTarget for frequency transitions
     phaseAdder = (1 - smoothingFactor) * phaseAdder + smoothingFactor * phaseAdderTarget;
+    
+    // Smooth morphingFactor towards morphTargetFactor for waveform morphing
+    morphingFactor = (1 - morphSmoothing) * morphingFactor + morphSmoothing * morphTargetFactor;
 
-    // Generate the signal based on the current waveform type (formeOnde) and fill the buffer
+    // Generate the blended signal and fill the buffer
     if (noteOn) {
-        switch (formeOnde) {
-            case 0: // if formeOnde == 0, call calc_sin to fill the buffer with a sine wave
-                calc_sin(buffer, n);
-                break;
-            case 1: // if formeOnde == 1, call calcul_carre to fill the buffer with a square wave
-                calcul_carre(buffer, n);
-                break;
-            case 2: // if formeOnde == 2, call calcul_scie to fill the buffer
-                calcul_scie(buffer, n);
-                break;
-            default:    
-                for (int i = 0; i < n; i++) {
-                    buffer[i] = 0.0f;
-                }
-                break;
+        generateBlendedSamples(buffer, n);
+    } else {
+        // Silence when noteOn is false
+        for (int i = 0; i < n; i++) {
+            buffer[i*buffer.getNumChannels() + 0] = 0.0f;
+            buffer[i*buffer.getNumChannels() + 1] = 0.0f;
         }
     }
 
 }
 
 //--------------------------------------------------------------
-void oscilator::calc_sin(ofSoundBuffer & buffer, int n){
-    // Calculate the sine wave values for the given amplitude A, frequency f, time t, and fill the buffer with the generated samples
-    for (int i = 0; i < n; i++){
-    	
-        float sample;
-	    sample = A * sin(phase);
+float oscilator::calc_sin_sample(){
+    // Calculate and return a single sine wave sample
+    float sample = A * sin(phase);
+    phase += phaseAdder;
+    return sample;
+}
+
+//--------------------------------------------------------------
+float oscilator::calcul_carre_sample(){
+    // Calculate and return a single square wave sample
+    float sample = 0;
+    for (int k = 0; k <= b; k++){
+        sample += sin((2 * k + 1) * phase) / (2 * k + 1);
+    }
+    sample *= (4 / PI);
+    sample *= A; // Scale by amplitude
+    phase += phaseAdder;
+    return sample;
+}
+
+//--------------------------------------------------------------
+float oscilator::calcul_scie_sample(){
+    // Calculate and return a single sawtooth wave sample
+    float sample = 0;
+    for (int k = 1; k <= b + 1; k++){
+        sample += pow(-1, k) * sin(k * phase) / k;
+    }
+    sample *= (2 / PI);
+    sample *= A; // Scale by amplitude
+    phase += phaseAdder;
+    return sample;
+}
+
+//--------------------------------------------------------------
+void oscilator::generateBlendedSamples(ofSoundBuffer & buffer, int n){
+    // Generate blended waveform samples based on morphingFactor
+    // 0.0 = sine, 0.5 = square, 1.0 = sawtooth
+    for (int i = 0; i < n; i++) {
+        float sample = 0.0f;
         
-        // Fill the buffer with the generated sample (same for left and right channels for mono output)
-        buffer[i*buffer.getNumChannels() + 0] = sample; // Left channel
-	    buffer[i*buffer.getNumChannels() + 1] = sample; // Right channel (same as left for mono output)
-        phase += phaseAdder;
-   }
-
-}
-
-//--------------------------------------------------------------
-void oscilator::calcul_carre(ofSoundBuffer & buffer, int n){
-    // Calculate the square wave values for the given amplitude A, frequency f, time t, and fill the buffer with the generated samples
-    for (int i = 0; i < n; i++){
-    	
-        float sample = 0;
-	    for (int k=0; k <= b; k++){
-            sample += sin((2 * k + 1) * phase) / (2 * k + 1);
+        // Save phase state to recompute waveforms independently
+        float phaseSnapshot = phase;
+        
+        // Determine which waveforms to blend
+        if (morphingFactor <= 0.5f) {
+            // Blend between sine (0.0) and square (0.5)
+            float alpha = morphingFactor * 2.0f; // Scale to [0, 1]
+            
+            // Reset phase and compute sine sample
+            phase = phaseSnapshot;
+            float sinSample = calc_sin_sample();
+            
+            // Reset phase and compute square sample
+            phase = phaseSnapshot;
+            float sqSample = calcul_carre_sample();
+            
+            // Linear blend
+            sample = (1.0f - alpha) * sinSample + alpha * sqSample;
+        } else {
+            // Blend between square (0.5) and sawtooth (1.0)
+            float alpha = (morphingFactor - 0.5f) * 2.0f; // Scale to [0, 1]
+            
+            // Reset phase and compute square sample
+            phase = phaseSnapshot;
+            float sqSample = calcul_carre_sample();
+            
+            // Reset phase and compute sawtooth sample
+            phase = phaseSnapshot;
+            float scieSample = calcul_scie_sample();
+            
+            // Linear blend
+            sample = (1.0f - alpha) * sqSample + alpha * scieSample;
         }
-        sample *= (4 / PI);
-        sample *= A; // Scale by amplitude
-
-
-        // Fill the buffer with the generated sample (same for left and right channels for mono output)
+        
+        // Fill both channels with the blended sample
         buffer[i*buffer.getNumChannels() + 0] = sample; // Left channel
-	    buffer[i*buffer.getNumChannels() + 1] = sample; // Right channel (same as left for mono output)
-        phase += phaseAdder;
-   }
-
-}
-
-//--------------------------------------------------------------
-void oscilator::calcul_scie(ofSoundBuffer & buffer, int n){
-    // Calculate the sawtooth wave values for the given amplitude A, frequency f, time t, and fill the buffer with the generated samples
-    for (int i = 0; i < n; i++){
-    	
-        float sample = 0;
-	    for (int k=1; k <= b+1; k++){
-            sample += pow(-1, k) * sin(k * phase) / (k);
-        }
-        sample *= (2 / PI);
-        sample *= A; // Scale by amplitude
-
-
-        // Fill the buffer with the generated sample (same for left and right channels for mono output)
-        buffer[i*buffer.getNumChannels() + 0] = sample; // Left channel
-	    buffer[i*buffer.getNumChannels() + 1] = sample; // Right channel (same as left for mono output)
-        phase += phaseAdder;
-   }
-
+        buffer[i*buffer.getNumChannels() + 1] = sample; // Right channel
+    }
 }
