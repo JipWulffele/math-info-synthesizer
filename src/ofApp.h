@@ -2,6 +2,7 @@
 
 #include "ofMain.h"
 #include "oscilator.h"
+#include "ofxGui.h"
 
 class ofApp : public ofBaseApp{
 
@@ -37,4 +38,14 @@ class ofApp : public ofBaseApp{
 		
 		// Oscilator instance
 		oscilator myOscilator;
+
+		// GUI
+    	ofxPanel gui;
+    	// ofParameter<float> brillanceGui;
+		ofxFloatSlider brillanceSliderGui;
+		ofxFloatSlider amplitudeSliderGui;
+		ofxFloatSlider frequencesGui;
+		ofxToggle mouseToggleGui;
+	
+
 };
