@@ -30,7 +30,7 @@ void ofApp::setup(){
 
 	// setup gui IHM
 	gui.setup("Synth");
-	gui.add(brillanceSliderGui.setup("Brillance", 3.0f, 0.0f, 20.0f));
+	gui.add(brillanceSliderGui.setup("Brillance", 3.0f, 1.0f, 32.0f));
 	gui.add(frequencesGui.setup("Frequence", 440.0f, 1.0f, 22050.0f));
 
 }
