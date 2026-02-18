@@ -39,6 +39,7 @@ class ofApp : public ofBaseApp{
 		// Gestion clavier
 		bool noteOn = false ;
 		std::string currentNote; // nom de la note actuellement pressée
+		oscilator myBourdon;
 
 		// setup keyboard -> 1 oscilator by note stored in oscillators
 		std::array<oscilator, 12> oscillators;
@@ -51,9 +52,11 @@ class ofApp : public ofBaseApp{
 
 		// GUI
     	ofxPanel gui;
+		ofxToggle bourdonToggleGui;
+		ofxFloatSlider frequencesGui;
+
 		ofxFloatSlider brillanceSliderGui;
 		ofxFloatSlider amplitudeSliderGui;
-		ofxFloatSlider frequencesGui;
 		ofxToggle mouseToggleGui;
 		
 		// Waveform amplitude sliders
