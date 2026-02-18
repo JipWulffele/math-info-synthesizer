@@ -122,89 +122,78 @@ float oscilator::calc_sin_sample(){
 
 //--------------------------------------------------------------
 float oscilator::calcul_carre_sample(){
-    // Calculate and return a single square wave sample with harmonic interpolation
-    int harmonics = (int)b; // Integer part: number of harmonics
-    float blend = b - harmonics; // Fractional part: interpolation factor [0, 1]
-    
-    // Generate sample with 'harmonics' harmonic terms
-    float sampleLow = 0;
-    for (int k = 0; k <= harmonics; k++){
-        sampleLow += sin((2 * k + 1) * phase) / (2 * k + 1);
+    // Simplified square wave: sum odd harmonics with an optional partial last harmonic
+    int N = (int)b;            // integer part
+    float blend = b - N;       // fractional part [0..1]
+
+    float s = 0.0f;
+    // Add N harmonics fully
+    for (int k = 0; k < N; k++) {
+        int n = 2 * k + 1;
+        s += sin(n * phase) / (float)n;
     }
-    sampleLow *= (4 / PI);
-    sampleLow *= A; // Scale by amplitude
-    
-    // Generate sample with 'harmonics+1' harmonic terms
-    float sampleHigh = 0;
-    for (int k = 0; k <= harmonics + 1; k++){
-        sampleHigh += sin((2 * k + 1) * phase) / (2 * k + 1);
-    }
-    sampleHigh *= (4 / PI);
-    sampleHigh *= A; // Scale by amplitude
-    
-    // Linear interpolation between the two
-    float sample = (1.0f - blend) * sampleLow + blend * sampleHigh;
-    
+    // Add the next harmonic partially
+    int k = N;
+    int n = 2 * k + 1;
+    s += blend * (sin(n * phase) / (float)n);
+
+    // Scale
+    s *= (4.0f / PI);
+    s *= A;
+
     phase += phaseAdder;
-    return sample;
+    return s;
 }
 
 //--------------------------------------------------------------
 float oscilator::calcul_scie_sample(){
-    // Calculate and return a single sawtooth wave sample with harmonic interpolation
-    int harmonics = (int)b; // Integer part: number of harmonics
-    float blend = b - harmonics; // Fractional part: interpolation factor [0, 1]
-    
-    // Generate sample with 'harmonics+1' harmonic terms
-    float sampleLow = 0;
-    for (int k = 1; k <= harmonics + 1; k++){
-        sampleLow += pow(-1, k) * sin(k * phase) / k;
+    // Simplified sawtooth: sum harmonics with optional partial last harmonic
+    int N = (int)b;            // integer part
+    float blend = b - N;       // fractional part [0..1]
+
+    float s = 0.0f;
+    // Add N harmonics fully (k from 1..N)
+    for (int k = 1; k <= N; k++) {
+        s += pow(-1.0f, k) * sin(k * phase) / (float)k;
     }
-    sampleLow *= (2 / PI);
-    sampleLow *= A; // Scale by amplitude
-    
-    // Generate sample with 'harmonics+2' harmonic terms
-    float sampleHigh = 0;
-    for (int k = 1; k <= harmonics + 2; k++){
-        sampleHigh += pow(-1, k) * sin(k * phase) / k;
-    }
-    sampleHigh *= (2 / PI);
-    sampleHigh *= A; // Scale by amplitude
-    
-    // Linear interpolation between the two
-    float sample = (1.0f - blend) * sampleLow + blend * sampleHigh;
-    
+    // Add the next harmonic partially
+    int k = N + 1;
+    s += blend * (pow(-1.0f, k) * sin(k * phase) / (float)k);
+
+    // Scale
+    s *= (2.0f / PI);
+    s *= A;
+
     phase += phaseAdder;
-    return sample;
+    return s;
 }
 
 //--------------------------------------------------------------
 float oscilator::calc_triangle_sample() {
-    // Calculate and return a single triangle wave sample with harmonic interpolation
-    int harmonics = (int)b; // Integer part: number of harmonics
-    float blend = b - harmonics; // Fractional part: interpolation factor [0, 1]
-    
-    // Generate sample with 'harmonics+1' harmonic terms
-    float sampleLow = 0;
-    for (int k = 0; k <= harmonics + 1; k++){
-        sampleLow += pow(-1, k) * sin((2 * k + 1) * phase) / pow((2 * k + 1), 2);
+    int N = (int)b;            // integer part
+    float blend = b - N;       // fractional part [0..1]
+
+    float s = 0.0f;
+
+    // Add N harmonics fully
+    for (int k = 0; k < N; k++) {
+        int n = 2 * k + 1;
+        float sign = (k & 1) ? -1.0f : 1.0f;
+        s += sign * sin(n * phase) / (float)(n * n);
     }
-    sampleLow *= (8 / pow(PI, 2));
-    sampleLow *= A; // Scale by amplitude
-    
-    // Generate sample with 'harmonics+2' harmonic terms
-    float sampleHigh = 0;
-    for (int k = 0; k <= harmonics + 2; k++){
-        sampleHigh += pow(-1, k) * sin((2 * k + 1) * phase) / pow((2 * k + 1), 2);
-    }
-    sampleHigh *= (8 / pow(PI, 2));
-    sampleHigh *= A; // Scale by amplitude
-    
-    // Linear interpolation between the two
-    float sample = (1.0f - blend) * sampleLow + blend * sampleHigh;
-    
+
+    // Add the next harmonic partially
+    int k = N;
+    int n = 2 * k + 1;
+    float sign = (k & 1) ? -1.0f : 1.0f;
+    s += blend * (sign * sin(n * phase) / (float)(n * n));
+
+    // Scale
+    s *= (8.0f / (PI * PI));
+    s *= A;
+
     phase += phaseAdder;
-    return sample;
+    return s;
 }
 
 //--------------------------------------------------------------
