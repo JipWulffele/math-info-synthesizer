@@ -45,7 +45,6 @@ class ofApp : public ofBaseApp{
 
 		// GUI
     	ofxPanel gui;
-    	// ofParameter<float> brillanceGui;
 		ofxFloatSlider brillanceSliderGui;
 		ofxFloatSlider amplitudeSliderGui;
 		ofxFloatSlider frequencesGui;

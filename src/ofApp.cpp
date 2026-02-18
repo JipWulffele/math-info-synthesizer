@@ -30,8 +30,16 @@ void ofApp::setup(){
 
 	// setup gui IHM
 	gui.setup("Synth");
+	gui.add(amplitudeSliderGui.setup("Amplitude", 0.5f, 0.0f, 1.0f));
 	gui.add(brillanceSliderGui.setup("Brillance", 3.0f, 1.0f, 32.0f));
 	gui.add(frequencesGui.setup("Frequence", 440.0f, 1.0f, 22050.0f));
+
+    // Waveform amplitude sliders
+	gui.add(ampSineGui.setup("Sine", 1.0f, 0.0f, 1.0f));
+	gui.add(ampSquareGui.setup("Square", 0.0f, 0.0f, 1.0f));
+	gui.add(ampSawtoothGui.setup("Sawtooth", 0.0f, 0.0f, 1.0f));
+	gui.add(ampTriangleGui.setup("Triangle", 0.0f, 0.0f, 1.0f));
+
 
 	// initialisation of keyboard
 	for (int i = 0; i < 12; i++){
@@ -55,18 +63,6 @@ void ofApp::draw(){
 	ofDrawBitmapString("AUDIO OUTPUT", 32, 32);
 	ofDrawBitmapString("Use sliders to mix waveforms (Sine, Square, Sawtooth, Triangle)", 31, 62);
 
-	// Indiquer la forme d'onde actuelle and morphing factor
-	std::string waveName;
-
-	float morph = oscillators[0].getMorphingFactor();
-	if(morph < 0.25f) waveName = "Sine to Square";
-	else if(morph < 0.5f) waveName = "Square (blend from Sine)";
-	else if(morph < 0.75f) waveName = "Square to Sawtooth";
-	else waveName = "Sawtooth (blend from Square)";
-
-	ofDrawBitmapString("Current waveform: " + waveName, 32, 92);
-	ofDrawBitmapString("Morphing factor: " + std::to_string(morph).substr(0, 4), 32, 107);
-	ofDrawBitmapString("Current musical note: " + currentNote, 32, 122);
 	// Display current waveform mix
 	ofDrawBitmapString("Waveform mix - Sine: " + std::to_string(ampSineGui).substr(0, 4) + 
 	                    " Square: " + std::to_string(ampSquareGui).substr(0, 4) + 
@@ -170,19 +166,7 @@ void ofApp::keyReleased(int key){
 
 //--------------------------------------------------------------
 void ofApp::mouseMoved(int x, int y ){
-    // Map mouseX (0 to ~900) to morphing factor (0 to 1)
-    // Left side = sine (0), middle = square (0.5), right side = sawtooth (1)
-    float morphFactor = ofMap(x, 0, 900, 0.0f, 1.0f, true);
-	float A = ofMap(y,0,ofGetHeight(),1,0); //axe négatif
 
-	for (auto & osc : oscillators){
-		osc.setMorphingFactor(morphFactor);	//float f = ofMap(x,0,ofGetWidth(),100,1000);
-		osc.setAmplitude(A);
-	}
-    
-    // Mouse Y controls amplitude
-	float A = ofMap(y, 0, ofGetHeight(), 1, 0); //axe négatif
-	myOscilator.setAmplitude(A);
 }
 
 //--------------------------------------------------------------
@@ -192,16 +176,12 @@ void ofApp::audioOut(ofSoundBuffer & buffer){
 
 	for (auto & osc : oscillators){
 		osc.setBrillance(brillanceSliderGui);
+		osc.setAmplitude(amplitudeSliderGui);
+		osc.setAmpSine(ampSineGui);
+		osc.setAmpSquare(ampSquareGui);
+		osc.setAmpSawtooth(ampSawtoothGui);
+		osc.setAmpTriangle(ampTriangleGui);
 	}
-	// Set oscillator parameters from GUI sliders
-	myOscilator.setBrillance(brillanceSliderGui);
-	myOscilator.setAmplitude(amplitudeSliderGui);
-	
-	// Set waveform amplitudes from GUI sliders
-	myOscilator.setAmpSine(ampSineGui);
-	myOscilator.setAmpSquare(ampSquareGui);
-	myOscilator.setAmpSawtooth(ampSawtoothGui);
-	myOscilator.setAmpTriangle(ampTriangleGui);
 
     // Call cbAudioProcess to fill the buffer with sound data
     cbAudioProcess(buffer);
