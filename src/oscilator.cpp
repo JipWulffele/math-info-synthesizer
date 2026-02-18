@@ -7,11 +7,11 @@
 oscilator::oscilator() {
     
     // Audio parameters
-    A = 0.5f; // Amplitude
+    A = 1.0f; // Amplitude
     f = 440.0f; // Frequency (440 Hz is the standard A note
     t = 0.0f; // Time
     formeOnde = 0; // Start with sine wave
-    b = 0.5f; // Medium brightness
+    b = 4.0f; // Medium brightness
     
     sampleRate = 44100.0f; // Standard sample rate for audio processing
     
@@ -75,10 +75,42 @@ void oscilator::calc_sin(ofSoundBuffer & buffer, int n){
 
 //--------------------------------------------------------------
 void oscilator::calcul_carre(ofSoundBuffer & buffer, int n){
+    // Calculate the square wave values for the given amplitude A, frequency f, time t, and fill the buffer with the generated samples
+    for (int i = 0; i < n; i++){
+    	
+        float sample = 0;
+	    for (int k=0; k <= b; k++){
+            sample += sin((2 * k + 1) * 2 * PI * f * t ) / (2 * k + 1);
+        }
+        sample *= (4 / PI);
+        sample *= A; // Scale by amplitude
+
+
+        // Fill the buffer with the generated sample (same for left and right channels for mono output)
+        buffer[i*buffer.getNumChannels() + 0] = sample; // Left channel
+	    buffer[i*buffer.getNumChannels() + 1] = sample; // Right channel (same as left for mono output)
+        t += 1.0f / sampleRate;
+   }
 
 }
 
 //--------------------------------------------------------------
 void oscilator::calcul_scie(ofSoundBuffer & buffer, int n){
+    // Calculate the sawtooth wave values for the given amplitude A, frequency f, time t, and fill the buffer with the generated samples
+    for (int i = 0; i < n; i++){
+    	
+        float sample = 0;
+	    for (int k=1; k <= b+1; k++){
+            sample += pow(-1, k) * sin(2 * k * PI * f * t ) / (k);
+        }
+        sample *= (2 / PI);
+        sample *= A; // Scale by amplitude
+
+
+        // Fill the buffer with the generated sample (same for left and right channels for mono output)
+        buffer[i*buffer.getNumChannels() + 0] = sample; // Left channel
+	    buffer[i*buffer.getNumChannels() + 1] = sample; // Right channel (same as left for mono output)
+        t += 1.0f / sampleRate;
+   }
 
 }
