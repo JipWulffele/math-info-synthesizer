@@ -28,6 +28,11 @@ void ofApp::setup(){
 	settings.bufferSize = bufferSize;
 	soundStream.setup(settings);
 
+	// setup gui IHM
+	gui.setup("Synth");
+	gui.add(brillanceSliderGui.setup("Brillance", 3.0f, 0.0f, 20.0f));
+	gui.add(frequencesGui.setup("Frequence", 440.0f, 1.0f, 22050.0f));
+
 }
 
 //--------------------------------------------------------------
@@ -103,6 +108,8 @@ void ofApp::draw(){
 			
 		ofPopMatrix();
 	ofPopStyle();
+
+	gui.draw();
 }
 
 //--------------------------------------------------------------
@@ -135,7 +142,10 @@ void ofApp::keyPressed(int key){
 
 	if (notePressed) {
 		myOscilator.setNoteOn(true);
-		myOscilator.setFrequency(laFreq * std::pow(2.0f, demiTon / 12.0f)) ;
+		float f = laFreq * std::pow(2.0f, demiTon / 12.0f);
+		myOscilator.setFrequency(f);
+		frequencesGui= f;
+
 	}
 }
 
@@ -160,11 +170,19 @@ void ofApp::mouseMoved(int x, int y ){
     // Map mouseX (0 to ~900) to morphing factor (0 to 1)
     // Left side = sine (0), middle = square (0.5), right side = sawtooth (1)
     float morphFactor = ofMap(x, 0, 900, 0.0f, 1.0f, true);
-    myOscilator.setMorphingFactor(morphFactor);
+    myOscilator.setMorphingFactor(morphFactor);	//float f = ofMap(x,0,ofGetWidth(),100,1000);
+	
+	float A = ofMap(y,0,ofGetHeight(),1,0); //axe négatif
+	myOscilator.setAmplitude(A);
 }
 
 //--------------------------------------------------------------
 void ofApp::audioOut(ofSoundBuffer & buffer){
+		
+	// set Brillance based on BrillanceSliderGui
+	myOscilator.setBrillance(brillanceSliderGui);
+	//myOscilator.setFrequency(frequencesGui);
+
     // Call cbAudioProcess to fill the buffer with sound data
     cbAudioProcess(buffer);
 

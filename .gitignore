@@ -31,6 +31,7 @@ Makefile
 addons.make
 config.make
 MathInfoProject.code-workspace
+math-info-synthesizer.code-workspace
 
 #OF
 openFrameworks/*
