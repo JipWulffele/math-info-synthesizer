@@ -6,26 +6,23 @@
 // Constructor to initialize the oscilator parameters
 oscilator::oscilator() {
     
-    // Audio parameters
-    A = 1.0f; // Amplitude [0, 1]
-    f = 440.0f; // Frequency (440 Hz is the standard A note)
+    // Initialize basic attributes
     t = 0.0f; // Time (legacy, kept for compatibility)
-
-    morphingFactor = 0.0f; // Start with sine wave
-    morphTargetFactor = 0.0f; // Target morphing factor
-    morphSmoothing = 0.05f; // Smoothing factor for morphing transitions
-    b = 4.0f; // Brillance [1, 32]
-    
     noteOn = false; // No active note (no sound to generate)
-    
     sampleRate = 44100.0f; // Standard sample rate for audio processing
-    
-    // Parameters for phase calculation
-    targetFrequency = f; // Initialize target frequency to the current frequency
     phase = 0.0f; // Initialize phase to zero
-    phaseAdder = (f / sampleRate) * TWO_PI; // Initialize phase adder based on frequency
-    phaseAdderTarget = phaseAdder; // Initialize target to match 
+    morphSmoothing = 0.05f; // Smoothing factor for morphing transitions
     smoothingFactor = 0.05f; // Smoothing factor for frequency transitions
+    
+    // Use setters for bounds enforcement
+    setAmplitude(1.0f); // Clamps to [0, 1]
+    setFrequency(440.0f); // Clamps to [20, 20000], updates target frequency and phaseAdderTarget
+    setBrillance(4.0f); // Clamps to [1, 32]
+    setMorphingFactor(0.0f); // Clamps to [0, 1], starts with sine wave
+    
+    // Initialize phase adder to match target
+    phaseAdder = phaseAdderTarget;
+    morphingFactor = morphTargetFactor;
 
 }
 
