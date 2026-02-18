@@ -1,5 +1,6 @@
 #include "ofApp.h"
 
+
 //--------------------------------------------------------------
 void ofApp::setup(){
 
@@ -28,6 +29,11 @@ void ofApp::setup(){
 	settings.bufferSize = bufferSize;
 	soundStream.setup(settings);
 
+	// setup gui IHM
+	gui.setup("Synth");
+	gui.add(brillanceSliderGui.setup("Brillance", 3.0f, 0.0f, 20.0f));
+	gui.add(frequencesGui.setup("Frequence", 440.0f, 1.0f, 22050.0f));
+
 }
 
 //--------------------------------------------------------------
@@ -51,6 +57,8 @@ void ofApp::draw(){
 
 	ofDrawBitmapString("Current waveform: " + waveName, 32, 92);
 	ofDrawBitmapString("Current musical note: " + currentNote, 32, 122);
+
+	ofDrawBitmapString("press 'o' to change waveform\npress 'b' to change the brillance", 31, 92);
 
 	ofNoFill();
 	
@@ -100,6 +108,8 @@ void ofApp::draw(){
 			
 		ofPopMatrix();
 	ofPopStyle();
+
+	gui.draw();
 }
 
 //--------------------------------------------------------------
@@ -137,7 +147,10 @@ void ofApp::keyPressed(int key){
 
 	if (notePressed) {
 		myOscilator.setNoteOn(true);
-		myOscilator.setFrequency(laFreq * std::pow(2.0f, demiTon / 12.0f)) ;
+		float f = laFreq * std::pow(2.0f, demiTon / 12.0f);
+		myOscilator.setFrequency(f);
+		frequencesGui= f;
+
 	}
 }
 
@@ -161,11 +174,20 @@ void ofApp::keyReleased(int key){
 void ofApp::mouseMoved(int x, int y ){
     // Update mouseX and mouseY variables with the current mouse position
     // Use these variables to control 'volume' and 'f' (frequency) of the sound
-
+	//float f = ofMap(x,0,ofGetWidth(),100,1000);
+	float A = ofMap(y,0,ofGetHeight(),1,0); //axe négatif
+	myOscilator.setAmplitude(A);
 }
 
 //--------------------------------------------------------------
 void ofApp::audioOut(ofSoundBuffer & buffer){
+		
+	// set Brillance based on BrillanceSliderGui
+	myOscilator.setBrillance(brillanceSliderGui);
+	//myOscilator.setFrequency(frequencesGui);
+
+
+
     // Call cbAudioProcess to fill the buffer with sound data
     cbAudioProcess(buffer);
 
