@@ -9,10 +9,18 @@ oscilator::oscilator() {
     // Initialize basic attributes
     t = 0.0f; // Time (legacy, kept for compatibility)
     noteOn = false; // No active note (no sound to generate)
+    prevNoteOn = false; // Previous noteOn state
     sampleRate = 44100.0f; // Standard sample rate for audio processing
     phase = 0.0f; // Initialize phase to zero
     morphSmoothing = 0.05f; // Smoothing factor for morphing transitions
     smoothingFactor = 0.05f; // Smoothing factor for frequency transitions
+    
+    // Initialize envelope attributes: smoothing volume
+    attackSamples = (int)(sampleRate / 100.0f); // 10ms attack
+    releaseSamples = (int)(sampleRate / 100.0f); // 10ms release
+    envelopeIncrement = 1.0f / attackSamples; // Increment per sample
+    volumeEnvelope = 0.0f; // Start silent
+    volumeTarget = 0.0f; // Target is OFF initially
     
     // Use setters for bounds enforcement
     setAmplitude(1.0f); // Clamps to [0, 1]
@@ -68,17 +76,18 @@ void  oscilator::get_signal(ofSoundBuffer & buffer, int n){
     // Smooth morphingFactor towards morphTargetFactor for waveform morphing
     morphingFactor = (1 - morphSmoothing) * morphingFactor + morphSmoothing * morphTargetFactor;
 
-    // Generate the blended signal and fill the buffer
-    if (noteOn) {
-        generateBlendedSamples(buffer, n);
-    } else {
-        // Silence when noteOn is false
-        for (int i = 0; i < n; i++) {
-            buffer[i*buffer.getNumChannels() + 0] = 0.0f;
-            buffer[i*buffer.getNumChannels() + 1] = 0.0f;
+    // Handle noteOn/Off transitions for envelope
+    if (noteOn != prevNoteOn) {
+        if (noteOn) {
+            volumeTarget = 1.0f; // Attack: ramp to full volume
+        } else {
+            volumeTarget = 0.0f; // Release: ramp to silence
         }
+        prevNoteOn = noteOn;
     }
 
+    // Always generate blended samples (envelope handles silence)
+    generateBlendedSamples(buffer, n);
 }
 
 //--------------------------------------------------------------
@@ -187,6 +196,24 @@ void oscilator::generateBlendedSamples(ofSoundBuffer & buffer, int n){
             // Linear blend
             sample = (1.0f - alpha) * sqSample + alpha * scieSample;
         }
+        
+        // Apply envelope (attack/release)
+        if (volumeEnvelope < volumeTarget) {
+            // Attack: ramp up
+            volumeEnvelope += envelopeIncrement;
+            if (volumeEnvelope > volumeTarget) {
+                volumeEnvelope = volumeTarget;
+            }
+        } else if (volumeEnvelope > volumeTarget) {
+            // Release: ramp down
+            volumeEnvelope -= envelopeIncrement;
+            if (volumeEnvelope < volumeTarget) {
+                volumeEnvelope = volumeTarget;
+            }
+        }
+        
+        // Scale sample by envelope
+        sample *= volumeEnvelope;
         
         // Fill both channels with the blended sample
         buffer[i*buffer.getNumChannels() + 0] = sample; // Left channel

@@ -43,6 +43,14 @@ class oscilator {
 		float phaseAdderTarget;
         float smoothingFactor; // Smoothing factor for frequency transitions
 
+        // Envelope attributes (attack/release)
+        float volumeEnvelope; // Current envelope level [0, 1]
+        float volumeTarget; // Target envelope level (0 for release, 1 for attack)
+        bool prevNoteOn; // Previous noteOn state to detect transitions
+        int attackSamples; // Number of samples for attack (1ms)
+        int releaseSamples; // Number of samples for release (1ms)
+        float envelopeIncrement; // Increment per sample (1.0 / attackSamples)
+
         // Methods to generate different waveforms (return sample value, not buffer)
         float  calc_sin_sample();
         float  calcul_carre_sample();
