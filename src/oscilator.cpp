@@ -102,7 +102,8 @@ void  oscilator::get_signal(ofSoundBuffer & buffer, int n){
     if (noteOn != prevNoteOn) {
         if (noteOn) {
             volumeTarget = 1.0f; // Attack: ramp to full volume
-        } else {
+        } 
+    else {
             volumeTarget = 0.0f; // Release: ramp to silence
         }
         prevNoteOn = noteOn;

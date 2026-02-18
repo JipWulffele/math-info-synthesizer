@@ -32,14 +32,14 @@ void ofApp::setup(){
 	gui.setup("Synth");
 	gui.add(brillanceSliderGui.setup("Brillance", 3.0f, 1.0f, 32.0f));
 	gui.add(frequencesGui.setup("Frequence", 440.0f, 1.0f, 22050.0f));
-	gui.add(amplitudeSliderGui.setup("Amplitude", 1.0f, 0.0f, 1.0f));
-	
-	// Waveform amplitude sliders
-	gui.add(ampSineGui.setup("Sine", 1.0f, 0.0f, 1.0f));
-	gui.add(ampSquareGui.setup("Square", 0.0f, 0.0f, 1.0f));
-	gui.add(ampSawtoothGui.setup("Sawtooth", 0.0f, 0.0f, 1.0f));
-	gui.add(ampTriangleGui.setup("Triangle", 0.0f, 0.0f, 1.0f));
 
+	// initialisation of keyboard
+	for (int i = 0; i < 12; i++){
+		float laFreq = 440.0f;
+		int demiTon = i - 9;
+		float f = laFreq * std::pow(2.0f, demiTon / 12.0f);
+		oscillators[i].setFrequency(f);
+	}
 }
 
 //--------------------------------------------------------------
@@ -55,6 +55,18 @@ void ofApp::draw(){
 	ofDrawBitmapString("AUDIO OUTPUT", 32, 32);
 	ofDrawBitmapString("Use sliders to mix waveforms (Sine, Square, Sawtooth, Triangle)", 31, 62);
 
+	// Indiquer la forme d'onde actuelle and morphing factor
+	std::string waveName;
+
+	float morph = oscillators[0].getMorphingFactor();
+	if(morph < 0.25f) waveName = "Sine to Square";
+	else if(morph < 0.5f) waveName = "Square (blend from Sine)";
+	else if(morph < 0.75f) waveName = "Square to Sawtooth";
+	else waveName = "Sawtooth (blend from Square)";
+
+	ofDrawBitmapString("Current waveform: " + waveName, 32, 92);
+	ofDrawBitmapString("Morphing factor: " + std::to_string(morph).substr(0, 4), 32, 107);
+	ofDrawBitmapString("Current musical note: " + currentNote, 32, 122);
 	// Display current waveform mix
 	ofDrawBitmapString("Waveform mix - Sine: " + std::to_string(ampSineGui).substr(0, 4) + 
 	                    " Square: " + std::to_string(ampSquareGui).substr(0, 4) + 
@@ -121,54 +133,53 @@ void ofApp::exit(){
 
 //--------------------------------------------------------------
 void ofApp::keyPressed(int key){
-    // Use the 'o' key to change the formOnde (0, 1, 2)
-    // Use the 'b' key to change the brillance
-
-	float laFreq = 440.0f;
-	int demiTon = 0;
-	bool notePressed = false;
+	// float laFreq = 440.0f;
+	// int demiTon = 0;
+	// bool notePressed = false;
 
 	// Gestion clavier musical
-    if(key == 'w')      { demiTon = -9; notePressed = true; currentNote = "Do"; }
-    else if(key == 's') { demiTon = -8; notePressed = true; currentNote = "Do#"; }
-    else if(key == 'x') { demiTon = -7; notePressed = true; currentNote = "Re"; }
-    else if(key == 'd') { demiTon = -6; notePressed = true; currentNote = "Re#"; }
-    else if(key == 'c') { demiTon = -5; notePressed = true; currentNote = "Mi"; }
-    else if(key == 'v') { demiTon = -4; notePressed = true; currentNote = "Fa"; }
-    else if(key == 'g') { demiTon = -3; notePressed = true; currentNote = "Fa#"; }
-    else if(key == 'b') { demiTon = -2; notePressed = true; currentNote = "Sol"; }
-    else if(key == 'h') { demiTon = -1; notePressed = true; currentNote = "Sol#"; }
-    else if(key == 'n') { demiTon = 0;  notePressed = true; currentNote = "La"; }
-    else if(key == 'j') { demiTon = 1;  notePressed = true; currentNote = "La#"; }
-    else if(key == ',') { demiTon = 2;  notePressed = true; currentNote = "Si"; }
-
-	if (notePressed) {
-		myOscilator.setNoteOn(true);
-		float f = laFreq * std::pow(2.0f, demiTon / 12.0f);
-		myOscilator.setFrequency(f);
-		frequencesGui= f;
-
-	}
+    if(key == 'w') { oscillators[0].setNoteOn(true); currentNote = "Do"; frequencesGui = oscillators[0].getFrequency(); }
+    if(key == 's') { oscillators[1].setNoteOn(true); currentNote = "Do#"; frequencesGui = oscillators[1].getFrequency(); }
+    if(key == 'x') { oscillators[2].setNoteOn(true); currentNote = "Re"; frequencesGui = oscillators[2].getFrequency(); }
+    if(key == 'd') { oscillators[3].setNoteOn(true); currentNote = "Re#"; frequencesGui = oscillators[3].getFrequency(); }
+    if(key == 'c') { oscillators[4].setNoteOn(true); currentNote = "Mi"; frequencesGui = oscillators[4].getFrequency(); }
+    if(key == 'v') { oscillators[5].setNoteOn(true); currentNote = "Fa"; frequencesGui = oscillators[5].getFrequency(); }
+    if(key == 'g') { oscillators[6].setNoteOn(true); currentNote = "Fa#"; frequencesGui = oscillators[6].getFrequency(); }
+    if(key == 'b') { oscillators[7].setNoteOn(true); currentNote = "Sol"; frequencesGui = oscillators[7].getFrequency(); }
+    if(key == 'h') { oscillators[8].setNoteOn(true); currentNote = "Sol#"; frequencesGui = oscillators[8].getFrequency(); }
+    if(key == 'n') { oscillators[9].setNoteOn(true); currentNote = "La"; frequencesGui = oscillators[9].getFrequency(); }
+    if(key == 'j') { oscillators[10].setNoteOn(true); currentNote = "La#"; frequencesGui = oscillators[10].getFrequency(); }
+    if(key == ',') { oscillators[11].setNoteOn(true); currentNote = "Si"; frequencesGui = oscillators[11].getFrequency(); }
 }
 
 //--------------------------------------------------------------
 void ofApp::keyReleased(int key){
-	if (key == 'w')     {myOscilator.setNoteOn(false); currentNote = "";}
-	else if(key == 's') {myOscilator.setNoteOn(false); currentNote = "";}
-	else if(key == 'x') {myOscilator.setNoteOn(false); currentNote = "";}
-	else if(key == 'd') {myOscilator.setNoteOn(false); currentNote = "";}
-	else if(key == 'c') {myOscilator.setNoteOn(false); currentNote = "";}
-	else if(key == 'v') {myOscilator.setNoteOn(false); currentNote = "";}
-	else if(key == 'g') {myOscilator.setNoteOn(false); currentNote = "";}
-	else if(key == 'b') {myOscilator.setNoteOn(false); currentNote = "";}
-	else if(key == 'h') {myOscilator.setNoteOn(false); currentNote = "";}
-	else if(key == 'n') {myOscilator.setNoteOn(false); currentNote = "";}
-	else if(key == 'j') {myOscilator.setNoteOn(false); currentNote = "";}
-	else if(key == ',') {myOscilator.setNoteOn(false); currentNote = "";}
+	if (key == 'w'){oscillators[0].setNoteOn(false); currentNote = "";}
+	if(key == 's') {oscillators[1].setNoteOn(false); currentNote = "";}
+	if(key == 'x') {oscillators[2].setNoteOn(false); currentNote = "";}
+	if(key == 'd') {oscillators[3].setNoteOn(false); currentNote = "";}
+	if(key == 'c') {oscillators[4].setNoteOn(false); currentNote = "";}
+	if(key == 'v') {oscillators[5].setNoteOn(false); currentNote = "";}
+	if(key == 'g') {oscillators[6].setNoteOn(false); currentNote = "";}
+	if(key == 'b') {oscillators[7].setNoteOn(false); currentNote = "";}
+	if(key == 'h') {oscillators[8].setNoteOn(false); currentNote = "";}
+	if(key == 'n') {oscillators[9].setNoteOn(false); currentNote = "";}
+	if(key == 'j') {oscillators[10].setNoteOn(false); currentNote = "";}
+	if(key == ',') {oscillators[11].setNoteOn(false); currentNote = "";}
 }
 
 //--------------------------------------------------------------
 void ofApp::mouseMoved(int x, int y ){
+    // Map mouseX (0 to ~900) to morphing factor (0 to 1)
+    // Left side = sine (0), middle = square (0.5), right side = sawtooth (1)
+    float morphFactor = ofMap(x, 0, 900, 0.0f, 1.0f, true);
+	float A = ofMap(y,0,ofGetHeight(),1,0); //axe négatif
+
+	for (auto & osc : oscillators){
+		osc.setMorphingFactor(morphFactor);	//float f = ofMap(x,0,ofGetWidth(),100,1000);
+		osc.setAmplitude(A);
+	}
+    
     // Mouse Y controls amplitude
 	float A = ofMap(y, 0, ofGetHeight(), 1, 0); //axe négatif
 	myOscilator.setAmplitude(A);
@@ -177,6 +188,11 @@ void ofApp::mouseMoved(int x, int y ){
 //--------------------------------------------------------------
 void ofApp::audioOut(ofSoundBuffer & buffer){
 		
+	// set Brillance based on BrillanceSliderGui
+
+	for (auto & osc : oscillators){
+		osc.setBrillance(brillanceSliderGui);
+	}
 	// Set oscillator parameters from GUI sliders
 	myOscilator.setBrillance(brillanceSliderGui);
 	myOscilator.setAmplitude(amplitudeSliderGui);
@@ -203,7 +219,30 @@ void ofApp::audioOut(ofSoundBuffer & buffer){
 void ofApp::cbAudioProcess(ofSoundBuffer & buffer){
     
 	// Use the oscilator instance to generate the sound signal based on the current parameters
-	myOscilator.get_signal(buffer, buffer.getNumFrames());
+	for (size_t i = 0; i < buffer.size(); i++){
+		buffer[i] = 0.0f;
+	}
+
+	ofSoundBuffer temp;
+	temp.allocate(buffer.getNumFrames(), buffer.getNumChannels());
+
+	for (auto & osc : oscillators){
+		osc.get_signal(temp, buffer.getNumFrames());
+
+		for (size_t i = 0; i < buffer.size(); i++){
+			buffer[i] += temp[i];
+		}
+	}
+
+	// Calcul du nombre de touche actives
+	int nbActiveNote = 0;
+	for (auto & osc : oscillators){
+		if (osc.getNoteOn()) {nbActiveNote ++;}
+	}
+
+	// éviter saturation
+    for(size_t i = 0; i < buffer.size(); i++)
+        buffer[i] /= std::max(nbActiveNote, 1);
 }
 
 //--------------------------------------------------------------
