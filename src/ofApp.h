@@ -43,6 +43,9 @@ class ofApp : public ofBaseApp{
 		// Oscilator instance
 		oscilator myOscilator;
 
+		// setup keyboard -> 1 oscilator by note stored in oscillators
+		std::array<oscilator, 12> oscillators;
+
 		// GUI
     	ofxPanel gui;
     	// ofParameter<float> brillanceGui;
