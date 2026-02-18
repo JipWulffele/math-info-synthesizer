@@ -55,6 +55,7 @@ class oscilator {
         float  calc_sin_sample();
         float  calcul_carre_sample();
         float  calcul_scie_sample();
+        float  calc_triangle_sample();
         
         // Helper method for blended waveform generation
         void generateBlendedSamples(ofSoundBuffer & buffer, int n);

@@ -157,6 +157,35 @@ float oscilator::calcul_scie_sample(){
 }
 
 //--------------------------------------------------------------
+float oscilator::calc_triangle_sample() {
+    // Calculate and return a single triangle wave sample with harmonic interpolation
+    int harmonics = (int)b; // Integer part: number of harmonics
+    float blend = b - harmonics; // Fractional part: interpolation factor [0, 1]
+    
+    // Generate sample with 'harmonics+1' harmonic terms
+    float sampleLow = 0;
+    for (int k = 1; k <= harmonics + 1; k++){
+        sampleLow += pow(-1, k) * sin((2 * k + 1) * phase) / pow((2 * k + 1), 2);
+    }
+    sampleLow *= (8 / pow(PI, 2));
+    sampleLow *= A; // Scale by amplitude
+    
+    // Generate sample with 'harmonics+2' harmonic terms
+    float sampleHigh = 0;
+    for (int k = 1; k <= harmonics + 2; k++){
+        sampleHigh += pow(-1, k) * sin((2 * k + 1) * phase) / pow((2 * k + 1), 2);
+    }
+    sampleHigh *= (8 / pow(PI, 2));
+    sampleHigh *= A; // Scale by amplitude
+    
+    // Linear interpolation between the two
+    float sample = (1.0f - blend) * sampleLow + blend * sampleHigh;
+    
+    phase += phaseAdder;
+    return sample;
+}
+
+//--------------------------------------------------------------
 void oscilator::generateBlendedSamples(ofSoundBuffer & buffer, int n){
     // Generate blended waveform samples based on morphingFactor
     // 0.0 = sine, 0.5 = square, 1.0 = sawtooth
