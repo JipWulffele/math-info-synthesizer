@@ -57,7 +57,8 @@ void ofApp::draw(){
 
 	// Indiquer la forme d'onde actuelle and morphing factor
 	std::string waveName;
-	float morph = myOscilator.getMorphingFactor();
+
+	float morph = oscillators[0].getMorphingFactor();
 	if(morph < 0.25f) waveName = "Sine to Square";
 	else if(morph < 0.5f) waveName = "Square (blend from Sine)";
 	else if(morph < 0.75f) waveName = "Square to Sawtooth";
@@ -166,18 +167,23 @@ void ofApp::mouseMoved(int x, int y ){
     // Map mouseX (0 to ~900) to morphing factor (0 to 1)
     // Left side = sine (0), middle = square (0.5), right side = sawtooth (1)
     float morphFactor = ofMap(x, 0, 900, 0.0f, 1.0f, true);
-    myOscilator.setMorphingFactor(morphFactor);	//float f = ofMap(x,0,ofGetWidth(),100,1000);
-	
 	float A = ofMap(y,0,ofGetHeight(),1,0); //axe négatif
-	myOscilator.setAmplitude(A);
+
+	for (auto & osc : oscillators){
+		osc.setMorphingFactor(morphFactor);	//float f = ofMap(x,0,ofGetWidth(),100,1000);
+		osc.setAmplitude(A);
+	}
+    
 }
 
 //--------------------------------------------------------------
 void ofApp::audioOut(ofSoundBuffer & buffer){
 		
 	// set Brillance based on BrillanceSliderGui
-	myOscilator.setBrillance(brillanceSliderGui);
-	//myOscilator.setFrequency(frequencesGui);
+
+	for (auto & osc : oscillators){
+		osc.setBrillance(brillanceSliderGui);
+	}
 
     // Call cbAudioProcess to fill the buffer with sound data
     cbAudioProcess(buffer);
@@ -195,7 +201,6 @@ void ofApp::audioOut(ofSoundBuffer & buffer){
 void ofApp::cbAudioProcess(ofSoundBuffer & buffer){
     
 	// Use the oscilator instance to generate the sound signal based on the current parameters
-	// myOscilator.get_signal(buffer, buffer.getNumFrames());
 	for (size_t i = 0; i < buffer.size(); i++){
 		buffer[i] = 0.0f;
 	}
@@ -210,9 +215,16 @@ void ofApp::cbAudioProcess(ofSoundBuffer & buffer){
 			buffer[i] += temp[i];
 		}
 	}
+
+	// Calcul du nombre de touche actives
+	int nbActiveNote = 0;
+	for (auto & osc : oscillators){
+		if (osc.getNoteOn()) {nbActiveNote ++;}
+	}
+
 	// éviter saturation
     for(size_t i = 0; i < buffer.size(); i++)
-        buffer[i] *= 0.2f; // ajuster en fct du nb de touche pressée
+        buffer[i] /= std::max(nbActiveNote, 1);
 }
 
 //--------------------------------------------------------------

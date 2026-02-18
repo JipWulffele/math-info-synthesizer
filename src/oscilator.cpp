@@ -70,35 +70,13 @@ void  oscilator::get_signal(ofSoundBuffer & buffer, int n){
 
     // Generate the blended signal and fill the buffer
     if (noteOn) {
-<<<<<<< HEAD
         generateBlendedSamples(buffer, n);
-    } else {
+    } 
+    else {
         // Silence when noteOn is false
         for (int i = 0; i < n; i++) {
             buffer[i*buffer.getNumChannels() + 0] = 0.0f;
             buffer[i*buffer.getNumChannels() + 1] = 0.0f;
-=======
-        switch (formeOnde) {
-            case 0: // if formeOnde == 0, call calc_sin to fill the buffer with a sine wave
-                calc_sin(buffer, n);
-                break;
-            case 1: // if formeOnde == 1, call calcul_carre to fill the buffer with a square wave
-                calcul_carre(buffer, n);
-                break;
-            case 2: // if formeOnde == 2, call calcul_scie to fill the buffer
-                calcul_scie(buffer, n);
-                break;
-            default:    
-                for (int i = 0; i < buffer.size(); i++) {
-                    buffer[i] = 0.0f;
-                }
-                break;
->>>>>>> b91c742 (ajout partiel gestion multitouche)
-        }
-    }
-    else {
-        for (int i = 0; i < buffer.size(); i++) {
-            buffer[i] = 0.0f;
         }
     }
 }
