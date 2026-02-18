@@ -136,26 +136,25 @@ void ofApp::keyPressed(int key){
 	else if (key == 51) myOscilator.setFormeOnde(2); // dent de scie numpad_3
 
 	if (notePressed) {
-		noteOn = true;
+		myOscilator.setNoteOn(true);
 		myOscilator.setFrequency(laFreq * std::pow(2.0f, demiTon / 12.0f)) ;
 	}
 }
 
 //--------------------------------------------------------------
 void ofApp::keyReleased(int key){
-	if (key == 'w')     {noteOn = false; currentNote = "";}
-	else if(key == 's') {noteOn = false; currentNote = "";}
-	else if(key == 'x') {noteOn = false; currentNote = "";}
-	else if(key == 'd') {noteOn = false; currentNote = "";}
-	else if(key == 'c') {noteOn = false; currentNote = "";}
-	else if(key == 'v') {noteOn = false; currentNote = "";}
-	else if(key == 'g') {noteOn = false; currentNote = "";}
-	else if(key == 'b') {noteOn = false; currentNote = "";}
-	else if(key == 'h') {noteOn = false; currentNote = "";}
-	else if(key == 'n') {noteOn = false; currentNote = "";}
-	else if(key == 'j') {noteOn = false; currentNote = "";}
-	else if(key == ',') {noteOn = false; currentNote = "";}
-
+	if (key == 'w')     {myOscilator.setNoteOn(false); currentNote = "";}
+	else if(key == 's') {myOscilator.setNoteOn(false); currentNote = "";}
+	else if(key == 'x') {myOscilator.setNoteOn(false); currentNote = "";}
+	else if(key == 'd') {myOscilator.setNoteOn(false); currentNote = "";}
+	else if(key == 'c') {myOscilator.setNoteOn(false); currentNote = "";}
+	else if(key == 'v') {myOscilator.setNoteOn(false); currentNote = "";}
+	else if(key == 'g') {myOscilator.setNoteOn(false); currentNote = "";}
+	else if(key == 'b') {myOscilator.setNoteOn(false); currentNote = "";}
+	else if(key == 'h') {myOscilator.setNoteOn(false); currentNote = "";}
+	else if(key == 'n') {myOscilator.setNoteOn(false); currentNote = "";}
+	else if(key == 'j') {myOscilator.setNoteOn(false); currentNote = "";}
+	else if(key == ',') {myOscilator.setNoteOn(false); currentNote = "";}
 }
 
 //--------------------------------------------------------------

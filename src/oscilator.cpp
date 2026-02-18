@@ -12,6 +12,7 @@ oscilator::oscilator() {
     t = 0.0f; // Time
     formeOnde = 0; // Start with sine wave
     b = 4.0f; // Medium brightness
+    noteOn = false; // No active note (no sound to generate)
     
     sampleRate = 44100.0f; // Standard sample rate for audio processing
     
@@ -31,28 +32,31 @@ int oscilator::getFormeOnde() const { return formeOnde; }
 void oscilator::setFormeOnde(int forme) { formeOnde = forme; }
 float oscilator::getBrillance() const { return b; }
 void oscilator::setBrillance(float brillance) { b = brillance; }
+bool oscilator::getNoteOn() const { return noteOn; }
+void oscilator::setNoteOn(bool value) { noteOn = value; }
 
 //--------------------------------------------------------------
 void  oscilator::get_signal(ofSoundBuffer & buffer, int n){
     // if formeOnde == 0, call calc_sin to fill the buffer with a sine wave
     // if formeOnde == 1, call calcul_carre to fill the buffer with a square wave
     // if formeOnde == 2, call calcul_scie to fill the buffer
-
-    switch (formeOnde) {
-        case 0:
-            calc_sin(buffer, n);
-            break;
-        case 1:
-            calcul_carre(buffer, n);
-            break;
-        case 2:
-            calcul_scie(buffer, n);
-            break;
-        default:    
-            for (int i = 0; i < n; i++) {
-                buffer[i] = 0.0f;
-            }
-            break;
+    if (noteOn) {
+        switch (formeOnde) {
+            case 0:
+                calc_sin(buffer, n);
+                break;
+            case 1:
+                calcul_carre(buffer, n);
+                break;
+            case 2:
+                calcul_scie(buffer, n);
+                break;
+            default:    
+                for (int i = 0; i < n; i++) {
+                    buffer[i] = 0.0f;
+                }
+                break;
+        };
     };
 
 }
