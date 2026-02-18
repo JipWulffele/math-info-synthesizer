@@ -42,6 +42,12 @@ class ofApp : public ofBaseApp{
 
 		// setup keyboard -> 1 oscilator by note stored in oscillators
 		std::array<oscilator, 12> oscillators;
+		const std::array<std::string, 12> noteNames = {
+			"Do","Do#","Re","Re#","Mi","Fa",
+			"Fa#","Sol","Sol#","La","La#","Si"
+		};
+
+		void updateCurrentNotes(); // pour recuperer la liste des notes actives
 
 		// GUI
     	ofxPanel gui;
