@@ -51,11 +51,16 @@ class ofApp : public ofBaseApp{
 
 		// GUI
     	ofxPanel gui;
-    	// ofParameter<float> brillanceGui;
 		ofxFloatSlider brillanceSliderGui;
 		ofxFloatSlider amplitudeSliderGui;
 		ofxFloatSlider frequencesGui;
 		ofxToggle mouseToggleGui;
+		
+		// Waveform amplitude sliders
+		ofxFloatSlider ampSineGui;
+		ofxFloatSlider ampSquareGui;
+		ofxFloatSlider ampSawtoothGui;
+		ofxFloatSlider ampTriangleGui;
 	
 
 };
