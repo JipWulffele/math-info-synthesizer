@@ -48,6 +48,7 @@ void ofApp::setup(){
 		float laFreq = 440.0f;
 		int demiTon = i - 9;
 		float f = laFreq * std::pow(2.0f, demiTon / 12.0f);
+		baseFrequencies[i] = f;  // Store base frequency
 		oscillators[i].setFrequency(f);
 	}
 }
@@ -133,9 +134,12 @@ void ofApp::exit(){
 
 //--------------------------------------------------------------
 void ofApp::keyPressed(int key){
-	// float laFreq = 440.0f;
-	// int demiTon = 0;
-	// bool notePressed = false;
+	// Numpad 0-9 for octave shifting
+	if (key >= '0' && key <= '9') {
+		octaveShift = key - '0';
+		updateOctaveShift();
+		return;
+	}
 
 	// Gestion clavier musical
     if(key == 'w') { oscillators[0].setNoteOn(true); }
@@ -271,6 +275,15 @@ void ofApp::updateCurrentNotes(){
         if(oscillators[i].getNoteOn()){
             currentNote += noteNames[i] + " ";
         }
+    }
+}
+
+//--------------------------------------------------------------
+void ofApp::updateOctaveShift(){
+    // Apply octave shift to all oscillators
+    for (int i = 0; i < 12; i++){
+        float shiftedFreq = baseFrequencies[i] * std::pow(2.0f, octaveShift);
+        oscillators[i].setFrequency(shiftedFreq);
     }
 }
 
