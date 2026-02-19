@@ -37,10 +37,7 @@ class ofApp : public ofBaseApp{
 
 		vector <float> audioFT; // Buffer to hold Fourier transform data for visualization
 
-		// Sound stream and buffer
-		ofSoundStream soundStream;
-		ofSoundBuffer soundBuffer;
-
+		
 		// Gestion clavier
 		bool noteOn = false ;
 		std::string currentNote; // nom de la note actuellement pressée
@@ -82,7 +79,7 @@ class ofApp : public ofBaseApp{
 		ofxFloatSlider bourdonAmpSquareGui;
 		ofxFloatSlider bourdonAmpSawtoothGui;
 		ofxFloatSlider bourdonAmpTriangleGui;
-
+		
 		// all the other oscillators
 		ofxToggle mouseToggleGui;
         // Melody
@@ -96,6 +93,9 @@ class ofApp : public ofBaseApp{
 		ofxFloatSlider ampSquareGui;
 		ofxFloatSlider ampSawtoothGui;
 		ofxFloatSlider ampTriangleGui;
-	
+		
+		// Sound stream and buffer
+		ofSoundStream soundStream;
+		ofSoundBuffer soundBuffer;
 
 };

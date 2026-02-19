@@ -1,9 +1,13 @@
 #include "ofApp.h"
+#include <iostream>
+
+using namespace std;
 #include "BourdonMelodies.h"
 #include <iostream>
 
 //--------------------------------------------------------------
 void ofApp::setup(){
+	cout << "[SETUP START] Application initialization beginning" << endl;
 
     ofBackground(34, 34, 34);
 	
@@ -13,14 +17,16 @@ void ofApp::setup(){
     // initialize a audio buffer
 	audioBuffer.assign(bufferSize, 0.0);
 	audioFT.assign(bufferSize, 0.0); // Placeholder for Fourier transform buffer
-
-    // Setup device and stream
-    soundStream.printDeviceList();
+	cout << "[SETUP] Buffers allocated - audioBuffer size: " << audioBuffer.size() << ", audioFT size: " << audioFT.size() << endl;
+    // Prepare audio settings but DON'T start the stream yet
     ofSoundStreamSettings settings;
 
     auto devices = soundStream.getMatchingDevices("default");
 	if(!devices.empty()){
 		settings.setOutDevice(devices[0]);
+		cout << "[SETUP] Audio device found: " << devices[0].deviceID << endl;
+	} else {
+		cout << "[SETUP WARNING] No audio device found!" << endl;
 	}
 
 	settings.setOutListener(this);
@@ -65,7 +71,24 @@ void ofApp::setup(){
 	gui.add(ampSawtoothGui.setup("Sawtooth", 0.0f, 0.0f, 1.0f));
 	gui.add(ampTriangleGui.setup("Triangle", 0.0f, 0.0f, 1.0f));
 	
+
+	// for (auto osc : oscillators){
+	// 	auto onAmplitudeChanged= [&osc](float & value){
+	// 		osc.setAmplitude(value);
+	// 	};
+
+	// 	auto onBrillanceChanged= [&osc](float & value){
+	// 		osc.setBrillance(value);
+	// 	};
+		
+	// 	//osc.setBrillance(brillanceSliderGui);
+
+	// 	amplitudeSliderGui.addListener(this, & onAmplitudeChanged);
+	// 	brillanceSliderGui.addListener(this, & onBrillanceChanged);
+	// }
+
 	// initialisation of keyboard
+	cout << "[SETUP] Initializing 12 oscillators" << endl;
 	for (int i = 0; i < 12; i++){
 		float laFreq = 440.0f;
 		int demiTon = i - 9;
@@ -73,6 +96,12 @@ void ofApp::setup(){
 		baseFrequencies[i] = f;  // Store base frequency
 		oscillators[i].setFrequency(f);
 	}
+	
+	// NOW start the audio stream after everything is initialized
+	cout << "[SETUP] About to call soundStream.setup() with bufferSize=" << bufferSize << ", sampleRate=" << sampleRate << endl;
+	soundStream.setup(settings);
+	cout << "[SETUP] soundStream.setup() completed" << endl;
+	cout << "[SETUP COMPLETE] All initialization finished, ready for audio" << endl;
 }
 
 //--------------------------------------------------------------
@@ -109,6 +138,11 @@ void ofApp::update(){
 //--------------------------------------------------------------
 void ofApp::draw(){
     // Draw current state of audiobuffer on the screen
+    static bool firstDraw = true;
+    if (firstDraw) {
+        cout << "[DRAW] First draw call - audioBuffer.size()=" << audioBuffer.size() << ", audioFT.size()=" << audioFT.size() << endl;
+        firstDraw = false;
+    }
 
     ofSetColor(225);
 	ofDrawBitmapString("AUDIO OUTPUT", 32, 32);
@@ -124,50 +158,57 @@ void ofApp::draw(){
 	ofNoFill();
 	
 	ofPushStyle();
-		ofPushMatrix();
-		ofTranslate(32, 150, 0);
+	ofPushMatrix();
+	ofTranslate(32, 150, 0);
 			
-		ofSetColor(225);
-		ofDrawBitmapString("Audio buffer", 4, 18);
+	ofSetColor(225);
+	ofDrawBitmapString("Audio buffer", 4, 18);
 		
-		ofSetLineWidth(1);	
-		ofDrawRectangle(0, 0, 900, 200);
+	ofSetLineWidth(1);	
+	ofDrawRectangle(0, 0, 900, 200);
 
-		ofSetColor(245, 58, 135);
-		ofSetLineWidth(3);
+	ofSetColor(245, 58, 135);
+	ofSetLineWidth(3);
 					
-			ofBeginShape();
-			for (unsigned int i = 0; i < audioBuffer.size(); i++){
-				float x =  ofMap(i, 0, audioBuffer.size(), 0, 900, true);
-				ofVertex(x, 100 -audioBuffer[i]*40.0f);
-			}
-			ofEndShape(false);
-			
-		ofPopMatrix();
+	ofBeginShape();
+	if (audioBuffer.empty()) {
+		ofLogWarning("ofApp") << "[DRAW WARNING] audioBuffer is empty!";
+	} else {
+		for (unsigned int i = 0; i < audioBuffer.size(); i++){
+			float x =  ofMap(i, 0, audioBuffer.size(), 0, 900, true);
+			ofVertex(x, 100 -audioBuffer[i]*40.0f);
+		}
+		ofEndShape(false);
+	}
+	ofPopMatrix();
 	ofPopStyle();
 
 	// Add Fourier transform visualization here (optional)
 	ofPushStyle();
-		ofPushMatrix();
-		ofTranslate(32, 350, 0);
-			
-		ofSetColor(225);
-		ofDrawBitmapString("Fourier Transform", 4, 18);
+	ofPushMatrix();
+	ofTranslate(32, 350, 0);
 		
-		ofSetLineWidth(1);	
-		ofDrawRectangle(0, 0, 900, 200);
-
-		ofSetColor(58, 135, 245);
-		ofSetLineWidth(3);
-					
-			ofBeginShape();
-			for (unsigned int i = 0; i < audioFT.size()/2; i++){
-				float x =  ofMap(i, 0, audioFT.size()/2, 0, 900, true);
-				ofVertex(x, 180 - audioFT[i]*200.0f);
-			}
-			ofEndShape(false);
+	ofSetColor(225);
+	ofDrawBitmapString("Fourier Transform", 4, 18);
+	
+	ofSetLineWidth(1);	
+	ofDrawRectangle(0, 0, 900, 200);
+	ofSetColor(58, 135, 245);
+	ofSetLineWidth(3);
 			
-		ofPopMatrix();
+	ofBeginShape();
+	if (audioFT.empty()) {
+		ofLogWarning("ofApp") << "[DRAW WARNING] audioFT is empty!";
+	} else {
+		for (unsigned int i = 0; i < audioFT.size()/2; i++){
+			float x =  ofMap(i, 0, audioFT.size()/2, 0, 900, true);
+			ofVertex(x, 180 - audioFT[i]*200.0f);
+		}
+	}
+	
+	ofEndShape(false);
+			
+	ofPopMatrix();
 	ofPopStyle();
 
 	gui.draw();
@@ -249,12 +290,21 @@ void ofApp::mouseMoved(int x, int y ){
 
 //--------------------------------------------------------------
 void ofApp::audioOut(ofSoundBuffer & buffer){
+	static bool firstAudioCallback = true;
+	if (firstAudioCallback) {
+		cout << "[AUDIO CALLBACK] First audioOut() call - buffer size=" << buffer.size() << ", audioBuffer.size()=" << audioBuffer.size() << endl;
+		firstAudioCallback = false;
+	}
 		
+	if (audioBuffer.empty()) {
+		cout << "[AUDIO CALLBACK ERROR] audioBuffer is empty in audioOut()!" << endl;
+	}
+	
 	// set Brillance based on BrillanceSliderGui
 
 	for (auto & osc : oscillators){
 		osc.setBrillance(brillanceSliderGui);
-		osc.setAmplitude(amplitudeSliderGui);
+		// osc.setAmplitude(amplitudeSliderGui);
 		osc.setAmpSine(ampSineGui);
 		osc.setAmpSquare(ampSquareGui);
 		osc.setAmpSawtooth(ampSawtoothGui);
@@ -303,11 +353,21 @@ void ofApp::audioOut(ofSoundBuffer & buffer){
 
 //--------------------------------------------------------------
 void ofApp::cbAudioProcess(ofSoundBuffer & buffer){
+	static int callCount = 0;
+	callCount++;
+	if (callCount % 100 == 0) {
+		cout << "[AUDIO PROCESS] Call #" << callCount << " - buffer.size()=" << buffer.size() << ", frames=" << buffer.getNumFrames() << endl;
+	}
  	
 	// Use the oscilator instance to generate the sound signal based on the current parameters
-	// for (size_t i = 0; i < buffer.size(); i++){
-	// 	buffer[i] = 0.0f;
-	// }
+	if (buffer.size() == 0) {
+		cout << "[AUDIO PROCESS ERROR] Buffer size is 0!" << endl;
+		return;
+	}
+	
+	for (size_t i = 0; i < buffer.size(); i++){
+		buffer[i] = 0.0f;
+	}
 	
 	// init signal with bourdon
 	if (!bourdonMelodyPlaying){
@@ -319,6 +379,10 @@ void ofApp::cbAudioProcess(ofSoundBuffer & buffer){
 	// add other oscillator signal
 	ofSoundBuffer temp;
 	temp.allocate(buffer.getNumFrames(), buffer.getNumChannels());
+	if (temp.size() == 0) {
+		cout << "[AUDIO PROCESS ERROR] Temp buffer allocation failed!" << endl;
+		return;
+	}
 
 	for (auto & osc : oscillators){
 		osc.get_signal(temp, buffer.getNumFrames());
@@ -333,6 +397,9 @@ void ofApp::cbAudioProcess(ofSoundBuffer & buffer){
 	for (auto & osc : oscillators){
 		if (osc.getNoteOn()) {nbActiveNote ++;}
 	}
+	if (callCount % 100 == 0) {
+		cout << "[AUDIO PROCESS] Active notes: " << nbActiveNote << endl;
+	}
 
 	// éviter saturation
     for(size_t i = 0; i < buffer.size(); i++)
@@ -345,6 +412,11 @@ void ofApp::computeFT(vector <float> & audio){
 	// Compute the Fourier transform of the aumyOscilator.setFormeOnde(0);dio buffer and store the result in fourierBuffer for visualization
 	
 	int n = audio.size(); // Number of samples in the audio buffer
+	
+	if (n <= 0 || n != (int)audioFT.size()) {
+		cout << "[COMPUTE FT ERROR] Size mismatch - audio.size()=" << n << ", audioFT.size()=" << audioFT.size() << endl;
+		return;
+	}
 
 	// Compute the real and imaginary parts of the fourier transform
 	float realPart[n], imagPart[n]; // Array to hold the real and imaginary parts of the fourier transform
