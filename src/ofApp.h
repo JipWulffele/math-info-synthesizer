@@ -83,15 +83,12 @@ class ofApp : public ofBaseApp{
 		ofxFloatSlider bourdonAmpSquareGui;
 		ofxFloatSlider bourdonAmpSawtoothGui;
 		ofxFloatSlider bourdonAmpTriangleGui;
-<<<<<<< HEAD
 		
-=======
 		// Filter bourdon
 		ofxToggle bourdonFilterToggleGui;
 		ofxFloatSlider bourdonFilterFreqGui;
 		ofxFloatSlider bourdonFilterQGui;
 
->>>>>>> 5dbc3fe (ajout de la gestion du filtre passe bande sur le bourdon)
 		// all the other oscillators
 		ofxToggle mouseToggleGui;
         // Melody

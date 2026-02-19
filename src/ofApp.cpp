@@ -54,7 +54,12 @@ void ofApp::setup(){
 	bourdonGui.add(bourdonAmpTriangleGui.setup("Triangle Bourdon", 0.0f, 0.0f, 1.0f));
 	
 	bourdonGui.add(mouseToggleGui.setup("Mouse control (m)",0));
-	
+
+	// filter for bourdon
+	bourdonGui.add(bourdonFilterToggleGui.setup("Filter ON/OFF", false));
+	bourdonGui.add(bourdonFilterFreqGui.setup("Filter F0", 500.0f, 20.0f, 10000.0f));
+	bourdonGui.add(bourdonFilterQGui.setup("Filter Q", 1.0f, 0.1f, 10.0f));
+
 	// add listener
 	bourdonAmplitudeGui.addListener(this, & ofApp::onBourdonAmplitudeChanged);
 	bourdonFrequencesGui.addListener(this, & ofApp::onBourdonFrequencyChanged);
@@ -94,9 +99,6 @@ void ofApp::setup(){
 		baseFrequencies[i] = f;  // Store base frequency
 		oscillators[i].setFrequency(f);
 	}
-	// setup des filtres
-	filterBP.setSampleRate(sampleRate); //transmet la frequence d'échantillonnage aux filtres
-	filterBP.setBPF(500.0f, 1.0f);
 	
 	// add filter to bourdon
 	bourdon.setFilterSampleRate(sampleRate);
@@ -373,13 +375,6 @@ void ofApp::audioOut(ofSoundBuffer & buffer){
 
 	// Call cbAudioProcess to fill the buffer with sound data
     cbAudioProcess(buffer);
-
-	// Filtrage global (pour les deux channels, on applique le meme filtre)
-	for (size_t i = 0; i < buffer.getNumFrames(); i++) {
-		float filtered = filterBP.process(buffer[i*buffer.getNumChannels() + 0]);
-		buffer[i*buffer.getNumChannels() + 0] = filtered;
-    	buffer[i*buffer.getNumChannels() + 1] = filtered;
-	}
 
 	// Compute the Fourier transform of the audio buffer for visualization (optional)
 	computeFT(audioBuffer);
