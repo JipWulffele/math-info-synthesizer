@@ -2,6 +2,7 @@
 
 #include "ofMain.h"
 #include "oscilator.h"
+#include "biquadFilter.h"
 #include "ofxGui.h"
 #include "BourdonMelodies.h"
 
@@ -65,6 +66,9 @@ class ofApp : public ofBaseApp{
 		void updateOctaveShift();  // Recalculate oscillator frequencies based on octaveShift
 		void drawKeyboard(float x, float y, float width, float height); // affichage clavier
 		void updateCurrentNotes(); // pour recuperer la liste des notes actives
+
+		// filter 
+		BiquadFilter filterBP;
 
 		// GUI
     	ofxPanel gui;

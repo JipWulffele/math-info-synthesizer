@@ -94,6 +94,9 @@ void ofApp::setup(){
 		baseFrequencies[i] = f;  // Store base frequency
 		oscillators[i].setFrequency(f);
 	}
+	// setup des filtres
+	filterBP.setSampleRate(sampleRate); //transmet la frequence d'échantillonnage aux filtres
+	filterBP.setBPF(500.0f, 1.0f);
 	
 	// NOW start the audio stream after everything is initialized
 	cout << "[SETUP] About to call soundStream.setup() with bufferSize=" << bufferSize << ", sampleRate=" << sampleRate << endl;
@@ -339,6 +342,13 @@ void ofApp::audioOut(ofSoundBuffer & buffer){
 
 	// Call cbAudioProcess to fill the buffer with sound data
     cbAudioProcess(buffer);
+
+	// Filtrage global (pour les deux channels, on applique le meme filtre)
+	for (size_t i = 0; i < buffer.getNumFrames(); i++) {
+		float filtered = filterBP.process(buffer[i*buffer.getNumChannels() + 0]);
+		buffer[i*buffer.getNumChannels() + 0] = filtered;
+    	buffer[i*buffer.getNumChannels() + 1] = filtered;
+	}
 
 	// Compute the Fourier transform of the audio buffer for visualization (optional)
 	computeFT(audioBuffer);
