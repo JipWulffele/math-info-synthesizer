@@ -2,6 +2,8 @@
 #include <iostream>
 
 using namespace std;
+#include "BourdonMelodies.h"
+#include <iostream>
 
 //--------------------------------------------------------------
 void ofApp::setup(){
@@ -32,7 +34,8 @@ void ofApp::setup(){
 	settings.numOutputChannels = 2;
 	settings.numInputChannels = 0;
 	settings.bufferSize = bufferSize;
-	
+
+	// setup gui Bourdon
 	gui.setup("Synth");
 
 	bourdonGui.setup("Bourdon");
@@ -40,12 +43,13 @@ void ofApp::setup(){
 
 	// # Bourdon
 	bourdonGui.add(bourdonToggleGui.setup("Activate Bourdon (p)",0));
+	bourdonGui.add(playBourdonMelodyButton.setup("Play Bourdon Melody",0)); // Bourdon Melody
 	bourdonGui.add(bourdonFrequencesGui.setup("Frequence Bourdon", 440.0f, 1.0f, 22050.0f));
 	bourdonGui.add(bourdonAmplitudeGui.setup ("Amplitude Bourdon", 0.5f, 0.0f, 1.0f));
 	bourdonGui.add(bourdonBrillanceGui.setup ("Brillance Bourdon", 3.0f, 1.0f, 32.0f));
     // ## Waveform amplitude sliders
 	bourdonGui.add(bourdonAmpSineGui.setup("Sine", 0.0f, 0.0f, 1.0f));
-	bourdonGui.add(bourdonAmpSquareGui.setup(  "Square   Bourdon", 1.0f, 0.0f, 1.0f));
+	bourdonGui.add(bourdonAmpSquareGui.setup("Square   Bourdon", 1.0f, 0.0f, 1.0f));
 	bourdonGui.add(bourdonAmpSawtoothGui.setup("Sawtooth Bourdon", 0.0f, 0.0f, 1.0f));
 	bourdonGui.add(bourdonAmpTriangleGui.setup("Triangle Bourdon", 0.0f, 0.0f, 1.0f));
 	
@@ -58,6 +62,7 @@ void ofApp::setup(){
 	// # all the other oscillators mouseToggleGui;
 	gui.add(amplitudeSliderGui.setup("Amplitude", 0.5f, 0.0f, 1.0f));
 	gui.add(brillanceSliderGui.setup("Brillance", 3.0f, 1.0f, 32.0f));
+
     // ## Waveform amplitude sliders
 	gui.add(ampSineGui.setup    ("Sine",     1.0f, 0.0f, 1.0f));
 	gui.add(ampSquareGui.setup  ("Square",   0.0f, 0.0f, 1.0f));
@@ -100,6 +105,32 @@ void ofApp::setup(){
 //--------------------------------------------------------------
 void ofApp::update(){
 
+    // Update bourdonMelody if it's playing
+	if(bourdonMelodyPlaying && !melody.empty()){
+
+		float now = ofGetElapsedTimef();
+		float elapsed = now - bourdonStepStartTime;
+
+		if(elapsed >= melody[bourdonStep].durationSec){
+
+			// next step
+			bourdonStep++;
+			if(bourdonStep >= melody.size()){
+				bourdonStep = 0; // loop
+			}
+
+			int idx = melody[bourdonStep].noteIndex;
+
+			if(idx == -1){
+				bourdonMelody.setNoteOn(false); // rest
+			} else {
+				bourdonMelody.setNoteOn(true);
+				bourdonMelody.setFrequency(baseFrequencies[idx]);
+			}
+
+			bourdonStepStartTime = now;
+		}
+	}
 }
 
 //--------------------------------------------------------------
@@ -209,7 +240,7 @@ void ofApp::keyPressed(int key){
 	if (key >= '0' && key <= '9') {
 		octaveShift = key - '0';
 		updateOctaveShift();
-		return;
+		//return;
 	}
 
 	// Gestion clavier musical
@@ -288,6 +319,24 @@ void ofApp::audioOut(ofSoundBuffer & buffer){
 	bourdon.setAmpSawtooth(bourdonAmpSawtoothGui);
 	bourdon.setAmpTriangle(bourdonAmpTriangleGui);
 
+	// manage bourdonMelody
+	bourdonMelody.setBrillance  (bourdonBrillanceGui);
+	bourdonMelody.setAmpSine    (bourdonAmpSineGui);
+	bourdonMelody.setAmpSquare  (bourdonAmpSquareGui);
+	bourdonMelody.setAmpSawtooth(bourdonAmpSawtoothGui);
+	bourdonMelody.setAmpTriangle(bourdonAmpTriangleGui);
+
+    // Manage melody bourdon
+	if(playBourdonMelodyButton){
+		if(!bourdonMelodyPlaying){
+			startBourdonMelody();
+		}
+	} else {
+		if(bourdonMelodyPlaying){
+			stopBourdonMelody();
+		}
+	}
+
 	// Call cbAudioProcess to fill the buffer with sound data
     cbAudioProcess(buffer);
 
@@ -319,7 +368,11 @@ void ofApp::cbAudioProcess(ofSoundBuffer & buffer){
 	}
 	
 	// init signal with bourdon
-	bourdon.get_signal(buffer, buffer.getNumFrames());
+	if (!bourdonMelodyPlaying){
+		bourdon.get_signal(buffer, buffer.getNumFrames());
+	} else {
+		bourdonMelody.get_signal(buffer, buffer.getNumFrames());
+	}
 
 	// add other oscillator signal
 	ofSoundBuffer temp;
@@ -476,8 +529,35 @@ void ofApp::drawKeyboard(float x, float y, float width, float height)
 // callback listener
 void ofApp::onBourdonAmplitudeChanged(float & value){
 	bourdon.setAmplitude(value);
+	bourdonMelody.setAmplitude(value);
 }
 
 void ofApp::onBourdonFrequencyChanged(float & value){
 	bourdon.setFrequency(value);
+	// Do not change the frequency of the bourdonMelody, as it is controlled by the melody steps 
 }
+
+
+void ofApp::startBourdonMelody(){
+    if(melody.empty()) return;
+
+    bourdonMelodyPlaying = true;
+    bourdonStep = 0;
+    bourdonStepStartTime = ofGetElapsedTimef();
+
+    int idx = melody[bourdonStep].noteIndex;
+	std::cout << "Starting bourdon melody, first note index: " << idx << std::endl;
+
+    if(idx == -1){
+        bourdonMelody.setNoteOn(false);
+    } else {
+        bourdonMelody.setNoteOn(true);
+        bourdonMelody.setFrequency(baseFrequencies[idx]);
+    }
+}
+
+void ofApp::stopBourdonMelody(){
+	bourdonMelodyPlaying = false;
+	bourdonMelody.setNoteOn(false);
+}
+
