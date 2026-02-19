@@ -3,6 +3,7 @@
 #include "ofMain.h"
 #include "oscilator.h"
 #include "ofxGui.h"
+#include "BourdonMelodies.h"
 
 class ofApp : public ofBaseApp{
 
@@ -39,7 +40,18 @@ class ofApp : public ofBaseApp{
 		// Gestion clavier
 		bool noteOn = false ;
 		std::string currentNote; // nom de la note actuellement pressée
+		
+		// Bourdons
 		oscilator bourdon;
+		oscilator bourdonMelody;
+		const std::vector<MelodyStep> melody = BourdonMelodies::happyAndYouKnowIt;
+
+		// Melody management
+		bool bourdonMelodyPlaying = false;
+		int bourdonStep = 0;
+		float bourdonStepStartTime = 0.0f;
+		void startBourdonMelody();
+		void stopBourdonMelody();
 
 		// setup keyboard -> 1 oscilator by note stored in oscillators
 		std::array<oscilator, 12> oscillators;
@@ -57,6 +69,9 @@ class ofApp : public ofBaseApp{
     	ofxPanel gui;
 		ofxToggle bourdonToggleGui;
 		ofxFloatSlider bourdonFrequencesGui;
+
+        // Melody
+		ofxToggle playBourdonMelodyButton;
 
 		ofxFloatSlider brillanceSliderGui;
 		ofxFloatSlider amplitudeSliderGui;
