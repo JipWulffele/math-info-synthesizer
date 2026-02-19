@@ -98,6 +98,17 @@ void ofApp::setup(){
 	filterBP.setSampleRate(sampleRate); //transmet la frequence d'échantillonnage aux filtres
 	filterBP.setBPF(500.0f, 1.0f);
 	
+	// add filter to bourdon
+	bourdon.setFilterSampleRate(sampleRate);
+	bourdon.setFilterActive(bourdonFilterToggleGui);
+	bourdon.setFilterBPF(bourdonFilterFreqGui, bourdonFilterQGui);
+
+	// add listener for filter info
+	bourdonFilterToggleGui.addListener(this, &ofApp::onBourdonFilterToggleChanged);
+	bourdonFilterFreqGui.addListener(this, &ofApp::onBourdonFilterFreqChanged);
+	bourdonFilterQGui.addListener(this, &ofApp::onBourdonFilterQChanged);
+
+	
 	// NOW start the audio stream after everything is initialized
 	cout << "[SETUP] About to call soundStream.setup() with bufferSize=" << bufferSize << ", sampleRate=" << sampleRate << endl;
 	soundStream.setup(settings);
@@ -208,6 +219,26 @@ void ofApp::draw(){
 	}
 	
 	ofEndShape(false);
+
+			//Filter affichage
+			if (bourdonFilterToggleGui)
+			{
+				ofSetColor(0, 255, 0);
+				ofSetLineWidth(2);
+
+				ofBeginShape();
+				for (unsigned int i = 0; i < audioFT.size()/2; i++)
+				{
+					float freq = ofMap(i, 0, audioFT.size()/2, 0, sampleRate/2);
+					float magnitude = bourdon.filter.getMagnitudeResponse(freq);
+
+					float x = ofMap(i, 0, audioFT.size()/2, 0, 900, true);
+					float y = 180 - magnitude * 150.0f;
+
+					ofVertex(x, y);
+				}
+				ofEndShape(false);
+			}
 			
 	ofPopMatrix();
 	ofPopStyle();
@@ -571,3 +602,15 @@ void ofApp::stopBourdonMelody(){
 	bourdonMelody.setNoteOn(false);
 }
 
+
+void ofApp::onBourdonFilterToggleChanged(bool & value){
+    bourdon.setFilterActive(value);
+}
+
+void ofApp::onBourdonFilterFreqChanged(float & value){
+    bourdon.setFilterBPF(value, bourdonFilterQGui);
+}
+
+void ofApp::onBourdonFilterQChanged(float & value){
+    bourdon.setFilterBPF(bourdonFilterFreqGui, value);
+}

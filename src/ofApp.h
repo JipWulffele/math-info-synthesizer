@@ -2,7 +2,6 @@
 
 #include "ofMain.h"
 #include "oscilator.h"
-#include "biquadFilter.h"
 #include "ofxGui.h"
 #include "BourdonMelodies.h"
 
@@ -30,6 +29,10 @@ class ofApp : public ofBaseApp{
 		// listeners
 		void onBourdonAmplitudeChanged(float & value);
 		void onBourdonFrequencyChanged(float & value);
+		void onBourdonFilterToggleChanged(bool & value);
+		void onBourdonFilterFreqChanged(float & value);
+		void onBourdonFilterQChanged(float & value);
+
 
 		// Variables for sound processing
 		vector <float> audioBuffer; // Buffer to hold audio samples
@@ -67,9 +70,6 @@ class ofApp : public ofBaseApp{
 		void drawKeyboard(float x, float y, float width, float height); // affichage clavier
 		void updateCurrentNotes(); // pour recuperer la liste des notes actives
 
-		// filter 
-		BiquadFilter filterBP;
-
 		// GUI
     	ofxPanel gui;
     	ofxPanel bourdonGui;
@@ -83,7 +83,15 @@ class ofApp : public ofBaseApp{
 		ofxFloatSlider bourdonAmpSquareGui;
 		ofxFloatSlider bourdonAmpSawtoothGui;
 		ofxFloatSlider bourdonAmpTriangleGui;
+<<<<<<< HEAD
 		
+=======
+		// Filter bourdon
+		ofxToggle bourdonFilterToggleGui;
+		ofxFloatSlider bourdonFilterFreqGui;
+		ofxFloatSlider bourdonFilterQGui;
+
+>>>>>>> 5dbc3fe (ajout de la gestion du filtre passe bande sur le bourdon)
 		// all the other oscillators
 		ofxToggle mouseToggleGui;
         // Melody
