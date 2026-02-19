@@ -32,7 +32,7 @@ void ofApp::setup(){
 	// setup gui IHM
 	gui.setup("Synth");
 	gui.add(bourdonToggleGui.setup("Activate Bourdon",0));
-	gui.add(frequencesGui.setup("Frequence", 440.0f, 1.0f, 22050.0f));
+	gui.add(bourdonFrequencesGui.setup("Frequence", 440.0f, 1.0f, 22050.0f));
 	gui.add(amplitudeSliderGui.setup("Amplitude", 0.5f, 0.0f, 1.0f));
 	gui.add(brillanceSliderGui.setup("Brillance", 3.0f, 1.0f, 32.0f));
 
@@ -188,8 +188,8 @@ void ofApp::audioOut(ofSoundBuffer & buffer){
 	}
 
 	// manage bourdon
-	myBourdon.setFrequency(frequencesGui);
-	myBourdon.setNoteOn(bourdonToggleGui);
+	bourdon.setFrequency(bourdonFrequencesGui);
+	bourdon.setNoteOn(bourdonToggleGui);
     // Call cbAudioProcess to fill the buffer with sound data
     cbAudioProcess(buffer);
 
@@ -204,13 +204,16 @@ void ofApp::audioOut(ofSoundBuffer & buffer){
 
 //--------------------------------------------------------------
 void ofApp::cbAudioProcess(ofSoundBuffer & buffer){
-    myBourdon.get_signal(buffer, buffer.getNumFrames());
-	
+ 	
 	// Use the oscilator instance to generate the sound signal based on the current parameters
-	for (size_t i = 0; i < buffer.size(); i++){
-		buffer[i] = 0.0f;
-	}
+	// for (size_t i = 0; i < buffer.size(); i++){
+	// 	buffer[i] = 0.0f;
+	// }
+	
+	// init signal with bourdon
+	bourdon.get_signal(buffer, buffer.getNumFrames());
 
+	// add other oscillator signal
 	ofSoundBuffer temp;
 	temp.allocate(buffer.getNumFrames(), buffer.getNumChannels());
 
