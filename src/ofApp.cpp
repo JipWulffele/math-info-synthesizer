@@ -28,11 +28,13 @@ void ofApp::setup(){
 	settings.bufferSize = bufferSize;
 	soundStream.setup(settings);
 
+
 	// setup gui IHM
 	gui.setup("Synth");
+	gui.add(bourdonToggleGui.setup("Activate Bourdon",0));
+	gui.add(bourdonFrequencesGui.setup("Frequence", 440.0f, 1.0f, 22050.0f));
 	gui.add(amplitudeSliderGui.setup("Amplitude", 0.5f, 0.0f, 1.0f));
 	gui.add(brillanceSliderGui.setup("Brillance", 3.0f, 1.0f, 32.0f));
-	gui.add(frequencesGui.setup("Frequence", 440.0f, 1.0f, 22050.0f));
 
     // Waveform amplitude sliders
 	gui.add(ampSineGui.setup("Sine", 1.0f, 0.0f, 1.0f));
@@ -185,6 +187,9 @@ void ofApp::audioOut(ofSoundBuffer & buffer){
 		osc.setAmpTriangle(ampTriangleGui);
 	}
 
+	// manage bourdon
+	bourdon.setFrequency(bourdonFrequencesGui);
+	bourdon.setNoteOn(bourdonToggleGui);
     // Call cbAudioProcess to fill the buffer with sound data
     cbAudioProcess(buffer);
 
@@ -199,12 +204,16 @@ void ofApp::audioOut(ofSoundBuffer & buffer){
 
 //--------------------------------------------------------------
 void ofApp::cbAudioProcess(ofSoundBuffer & buffer){
-    
+ 	
 	// Use the oscilator instance to generate the sound signal based on the current parameters
-	for (size_t i = 0; i < buffer.size(); i++){
-		buffer[i] = 0.0f;
-	}
+	// for (size_t i = 0; i < buffer.size(); i++){
+	// 	buffer[i] = 0.0f;
+	// }
+	
+	// init signal with bourdon
+	bourdon.get_signal(buffer, buffer.getNumFrames());
 
+	// add other oscillator signal
 	ofSoundBuffer temp;
 	temp.allocate(buffer.getNumFrames(), buffer.getNumChannels());
 
@@ -230,7 +239,7 @@ void ofApp::cbAudioProcess(ofSoundBuffer & buffer){
 //--------------------------------------------------------------
 // Add fourier transform function here (optional)
 void ofApp::computeFT(vector <float> & audio){
-	// Compute the Fourier transform of the audio buffer and store the result in fourierBuffer for visualization
+	// Compute the Fourier transform of the aumyOscilator.setFormeOnde(0);dio buffer and store the result in fourierBuffer for visualization
 	
 	int n = audio.size(); // Number of samples in the audio buffer
 
