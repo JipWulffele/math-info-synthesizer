@@ -34,8 +34,6 @@ void ofApp::setup(){
 	settings.numOutputChannels = 2;
 	settings.numInputChannels = 0;
 	settings.bufferSize = bufferSize;
-	soundStream.setup(settings);
-
 
 	// setup gui Bourdon
 	gui.setup("Synth");
