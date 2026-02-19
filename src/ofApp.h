@@ -25,6 +25,10 @@ class ofApp : public ofBaseApp{
 		
 		void computeFT(vector <float> & audio); // Function to compute Fourier transform 
 
+		// listeners
+		void onBourdonAmplitudeChanged(float & value);
+		void onBourdonFrequencyChanged(float & value);
+
 		// Variables for sound processing
 		vector <float> audioBuffer; // Buffer to hold audio samples
         int sampleRate; // Sample rate for audio processing
