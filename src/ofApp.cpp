@@ -122,6 +122,8 @@ void ofApp::draw(){
 	ofPopStyle();
 
 	gui.draw();
+	ofFill();
+	drawKeyboard(32, 600, 900, 180);
 }
 
 //--------------------------------------------------------------
@@ -265,9 +267,81 @@ void ofApp::updateCurrentNotes(){
 
     currentNote = "";
 
-    for(int i = 0; i < oscillators.size(); i++){
+    for(long unsigned int i = 0; i < oscillators.size(); i++){
         if(oscillators[i].getNoteOn()){
             currentNote += noteNames[i] + " ";
+        }
+    }
+}
+
+//--------------------------------------------------------------
+void ofApp::drawKeyboard(float x, float y, float width, float height)
+{
+    float whiteWidth = width / 7.0f;
+    float blackWidth = whiteWidth * 0.6f;
+    float blackHeight = height * 0.6f;
+	std::array<std::string, 12> keyLabels = {
+		"W","S","X","D","C","V",
+		"G","B","H","N","J",","
+	};
+
+    // Indique si la note est noire (12 demi-tons)
+    std::array<bool, 12> isBlack = {
+        false,true,false,true,false,
+        false,true,false,true,false,true,false
+    };
+
+    // TOUCHES BLANCHES
+    int whiteIndex = 0;
+
+    for(int i = 0; i < 12; i++)
+    {
+        if(!isBlack[i])
+        {
+            float keyX = x + whiteIndex * whiteWidth;
+
+            if(oscillators[i].getNoteOn())
+                ofSetColor(0, 255, 120);   // couleur active
+            else
+                ofSetColor(255);           // blanc normal
+
+            ofDrawRectangle(keyX, y, whiteWidth, height);
+
+            // contour
+            ofSetColor(0);
+            ofNoFill();
+            ofDrawRectangle(keyX, y, whiteWidth, height);
+            ofFill();
+
+            whiteIndex++;
+			// Dessin du label
+			ofSetColor(0); // noir pour texte sur blanc
+			ofDrawBitmapString(keyLabels[i], keyX + whiteWidth/2 - 4, y + height - 20);
+        }
+    }
+
+    // TOUCHES NOIRES
+    whiteIndex = 0;
+
+    for(int i = 0; i < 12; i++)
+    {
+        if(!isBlack[i])
+        {
+            whiteIndex++;
+        }
+        else
+        {
+            float keyX = x + whiteIndex * whiteWidth - blackWidth/2;
+
+            if(oscillators[i].getNoteOn())
+                ofSetColor(0, 255, 120);   // active
+            else
+                ofSetColor(0);             // noire normale
+
+            ofDrawRectangle(keyX, y, blackWidth, blackHeight);
+			// Dessin du label
+			ofSetColor(255); // blanc sur noir
+			ofDrawBitmapString(keyLabels[i], keyX + blackWidth/2 - 4, y + blackHeight - 8);
         }
     }
 }

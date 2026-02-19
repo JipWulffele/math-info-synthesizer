@@ -47,7 +47,7 @@ class ofApp : public ofBaseApp{
 			"Do","Do#","Re","Re#","Mi","Fa",
 			"Fa#","Sol","Sol#","La","La#","Si"
 		};
-
+		void drawKeyboard(float x, float y, float width, float height); // affichage clavier
 		void updateCurrentNotes(); // pour recuperer la liste des notes actives
 
 		// GUI
