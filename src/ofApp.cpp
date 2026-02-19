@@ -48,6 +48,10 @@ void ofApp::setup(){
 	
 	bourdonGui.add(mouseToggleGui.setup("Mouse control (m)",0));
 	
+	// add listener
+	bourdonAmplitudeGui.addListener(this, & ofApp::onBourdonAmplitudeChanged);
+	bourdonFrequencesGui.addListener(this, & ofApp::onBourdonFrequencyChanged);
+
 	// # all the other oscillators mouseToggleGui;
 	gui.add(amplitudeSliderGui.setup("Amplitude", 0.5f, 0.0f, 1.0f));
 	gui.add(brillanceSliderGui.setup("Brillance", 3.0f, 1.0f, 32.0f));
@@ -228,10 +232,10 @@ void ofApp::audioOut(ofSoundBuffer & buffer){
 	}
 
 	// manage bourdon
+	// Note: Amplitude & Frequency are updated with listeners
+	// see ofApp::onBourdonAmplitudeChanged & ofApp::onBourdonFrequencyChanged(float & value){
 	bourdon.setNoteOn(bourdonToggleGui);
-	bourdon.setFrequency(bourdonFrequencesGui);
 	bourdon.setBrillance  (bourdonBrillanceGui);
-	bourdon.setAmplitude  (bourdonAmplitudeGui);
 	bourdon.setAmpSine    (bourdonAmpSineGui);
 	bourdon.setAmpSquare  (bourdonAmpSquareGui);
 	bourdon.setAmpSawtooth(bourdonAmpSawtoothGui);
@@ -398,4 +402,13 @@ void ofApp::drawKeyboard(float x, float y, float width, float height)
 			ofDrawBitmapString(keyLabels[i], keyX + blackWidth/2 - 4, y + blackHeight - 8);
         }
     }
+}
+
+// callback listener
+void ofApp::onBourdonAmplitudeChanged(float & value){
+	bourdon.setAmplitude(value);
+}
+
+void ofApp::onBourdonFrequencyChanged(float & value){
+	bourdon.setFrequency(value);
 }
