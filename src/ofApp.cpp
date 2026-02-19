@@ -271,6 +271,12 @@ void ofApp::audioOut(ofSoundBuffer & buffer){
 	bourdon.setAmpSawtooth(bourdonAmpSawtoothGui);
 	bourdon.setAmpTriangle(bourdonAmpTriangleGui);
 
+	// manage bourdonMelody
+	bourdonMelody.setBrillance  (bourdonBrillanceGui);
+	bourdonMelody.setAmpSine    (bourdonAmpSineGui);
+	bourdonMelody.setAmpSquare  (bourdonAmpSquareGui);
+	bourdonMelody.setAmpSawtooth(bourdonAmpSawtoothGui);
+	bourdonMelody.setAmpTriangle(bourdonAmpTriangleGui);
 
     // Manage melody bourdon
 	if(playBourdonMelodyButton){
@@ -453,10 +459,12 @@ void ofApp::drawKeyboard(float x, float y, float width, float height)
 // callback listener
 void ofApp::onBourdonAmplitudeChanged(float & value){
 	bourdon.setAmplitude(value);
+	bourdonMelody.setAmplitude(value);
 }
 
 void ofApp::onBourdonFrequencyChanged(float & value){
 	bourdon.setFrequency(value);
+	// Do not change the frequency of the bourdonMelody, as it is controlled by the melody steps 
 }
 
 
