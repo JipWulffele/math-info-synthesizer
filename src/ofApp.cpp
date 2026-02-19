@@ -172,7 +172,7 @@ void ofApp::keyPressed(int key){
 	if (key >= '0' && key <= '9') {
 		octaveShift = key - '0';
 		updateOctaveShift();
-		return;
+		//return;
 	}
 
 	// Gestion clavier musical
