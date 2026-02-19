@@ -52,6 +52,7 @@ void oscilator::setFrequency(float frequency) {
     f = clamped; 
     targetFrequency = clamped;
     phaseAdderTarget = (clamped / sampleRate) * TWO_PI;
+    phaseAdder = phaseAdderTarget;
 }
 
 // Waveform amplitude getters and setters
@@ -77,8 +78,8 @@ void oscilator::setAmpTriangle(float amp) {
 
 float oscilator::getBrillance() const { return b; }
 void oscilator::setBrillance(float brillance) { 
-    // Clamp brillance to [1, 32]
-    b = (brillance < 1.0f) ? 1.0f : (brillance > 32.0f) ? 32.0f : brillance; 
+    // Clamp brillance to [1, 10]
+    b = (brillance < 1.0f) ? 1.0f : (brillance > 10.0f) ? 10.0f : brillance; 
 }
 
 void oscilator::setSmoothingFactor(float factor) { smoothingFactor = factor; }
@@ -114,18 +115,25 @@ void  oscilator::get_signal(ofSoundBuffer & buffer, int n){
 }
 
 //--------------------------------------------------------------
+void oscilator::update_phase(){
+    // Update phase and wrap to [0, 2π] to prevent overflow
+    phase += phaseAdder;
+    phase = fmod(phase, TWO_PI);
+}
+
+//--------------------------------------------------------------
 float oscilator::calc_sin_sample(){
     // Calculate and return a single sine wave sample
     float sample = A * sin(phase);
-    phase += phaseAdder;
+    update_phase();
     return sample;
 }
 
 //--------------------------------------------------------------
-float oscilator::calcul_carre_sample(){
+float oscilator::calcul_carre_sample(float brillance){
     // Simplified square wave: sum odd harmonics with an optional partial last harmonic
-    int N = (int)b;            // integer part
-    float blend = b - N;       // fractional part [0..1]
+    int N = (int)brillance;            // integer part
+    float blend = brillance - N;       // fractional part [0..1]
 
     float s = 0.0f;
     // Add N harmonics fully
@@ -142,15 +150,15 @@ float oscilator::calcul_carre_sample(){
     s *= (4.0f / PI);
     s *= A;
 
-    phase += phaseAdder;
+    update_phase();
     return s;
 }
 
 //--------------------------------------------------------------
-float oscilator::calcul_scie_sample(){
+float oscilator::calcul_scie_sample(float brillance){
     // Simplified sawtooth: sum harmonics with optional partial last harmonic
-    int N = (int)b;            // integer part
-    float blend = b - N;       // fractional part [0..1]
+    int N = (int)brillance;            // integer part
+    float blend = brillance - N;       // fractional part [0..1]
 
     float s = 0.0f;
     // Add N harmonics fully (k from 1..N)
@@ -165,14 +173,14 @@ float oscilator::calcul_scie_sample(){
     s *= (2.0f / PI);
     s *= A;
 
-    phase += phaseAdder;
+    update_phase();
     return s;
 }
 
 //--------------------------------------------------------------
-float oscilator::calc_triangle_sample() {
-    int N = (int)b;            // integer part
-    float blend = b - N;       // fractional part [0..1]
+float oscilator::calc_triangle_sample(float brillance) {
+    int N = (int)brillance;            // integer part
+    float blend = brillance - N;       // fractional part [0..1]
 
     float s = 0.0f;
 
@@ -193,12 +201,17 @@ float oscilator::calc_triangle_sample() {
     s *= (8.0f / (PI * PI));
     s *= A;
 
-    phase += phaseAdder;
+    update_phase();
     return s;
 }
 
 //--------------------------------------------------------------
 void oscilator::generateBlendedSamples(ofSoundBuffer & buffer, int n){
+    // Compute capped brillance to prevent aliasing
+    float actualFrequency = (phaseAdder / TWO_PI) * sampleRate;
+    float maxHarmonics = floor((sampleRate / 2.0f) / actualFrequency);
+    float cappedB = std::min(b, maxHarmonics);
+
     // Generate blended waveform samples mixing sine, square, sawtooth, and triangle
     for (int i = 0; i < n; i++) {
         float sample = 0.0f;
@@ -211,13 +224,13 @@ void oscilator::generateBlendedSamples(ofSoundBuffer & buffer, int n){
         float sinSample = calc_sin_sample();
 
         phase = phaseSnapshot;
-        float sqSample = calcul_carre_sample();
+        float sqSample = calcul_carre_sample(cappedB);
 
         phase = phaseSnapshot;
-        float scieSample = calcul_scie_sample();
+        float scieSample = calcul_scie_sample(cappedB);
 
         phase = phaseSnapshot;
-        float triSample = calc_triangle_sample();
+        float triSample = calc_triangle_sample(cappedB);
 
         // Mix waveforms using their (already relative) amplitudes
         sample = ampSine * sinSample + ampSquare * sqSample + ampSawtooth * scieSample + ampTriangle * triSample;

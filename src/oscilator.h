@@ -65,9 +65,12 @@ class oscilator {
 
         // Methods to generate different waveforms (return sample value, not buffer)
         float  calc_sin_sample();
-        float  calcul_carre_sample();
-        float  calcul_scie_sample();
-        float  calc_triangle_sample();
+        float  calcul_carre_sample(float brillance);
+        float  calcul_scie_sample(float brillance);
+        float  calc_triangle_sample(float brillance);
+        
+        // Helper method to update phase and wrap to [0, 2π]
+        void update_phase();
         
         // Helper method for blended waveform generation
         void generateBlendedSamples(ofSoundBuffer & buffer, int n);

@@ -34,7 +34,7 @@ void ofApp::setup(){
 	gui.add(bourdonToggleGui.setup("Activate Bourdon",0));
 	gui.add(bourdonFrequencesGui.setup("Frequence", 440.0f, 1.0f, 22050.0f));
 	gui.add(amplitudeSliderGui.setup("Amplitude", 0.5f, 0.0f, 1.0f));
-	gui.add(brillanceSliderGui.setup("Brillance", 3.0f, 1.0f, 32.0f));
+	gui.add(brillanceSliderGui.setup("Brillance", 3.0f, 1.0f, 10.0f));
 
     // Waveform amplitude sliders
 	gui.add(ampSineGui.setup("Sine", 1.0f, 0.0f, 1.0f));
