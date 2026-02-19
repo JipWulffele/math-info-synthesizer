@@ -52,7 +52,7 @@ class ofApp : public ofBaseApp{
 
 		// Melody management
 		bool bourdonMelodyPlaying = false;
-		int bourdonStep = 0;
+		unsigned int bourdonStep = 0;
 		float bourdonStepStartTime = 0.0f;
 		void startBourdonMelody();
 		void stopBourdonMelody();

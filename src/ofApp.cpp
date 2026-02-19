@@ -39,12 +39,13 @@ void ofApp::setup(){
 
 	// # Bourdon
 	bourdonGui.add(bourdonToggleGui.setup("Activate Bourdon (p)",0));
+	bourdonGui.add(playBourdonMelodyButton.setup("Play Bourdon Melody",0)); // Bourdon Melody
 	bourdonGui.add(bourdonFrequencesGui.setup("Frequence Bourdon", 440.0f, 1.0f, 22050.0f));
 	bourdonGui.add(bourdonAmplitudeGui.setup ("Amplitude Bourdon", 0.5f, 0.0f, 1.0f));
 	bourdonGui.add(bourdonBrillanceGui.setup ("Brillance Bourdon", 3.0f, 1.0f, 32.0f));
     // ## Waveform amplitude sliders
 	bourdonGui.add(bourdonAmpSineGui.setup("Sine", 0.0f, 0.0f, 1.0f));
-	bourdonGui.add(bourdonAmpSquareGui.setup(  "Square   Bourdon", 1.0f, 0.0f, 1.0f));
+	bourdonGui.add(bourdonAmpSquareGui.setup("Square   Bourdon", 1.0f, 0.0f, 1.0f));
 	bourdonGui.add(bourdonAmpSawtoothGui.setup("Sawtooth Bourdon", 0.0f, 0.0f, 1.0f));
 	bourdonGui.add(bourdonAmpTriangleGui.setup("Triangle Bourdon", 0.0f, 0.0f, 1.0f));
 	
@@ -58,8 +59,6 @@ void ofApp::setup(){
 	gui.add(amplitudeSliderGui.setup("Amplitude", 0.5f, 0.0f, 1.0f));
 	gui.add(brillanceSliderGui.setup("Brillance", 3.0f, 1.0f, 32.0f));
 
-    // Bourdon Melody
-	gui.add(playBourdonMelodyButton.setup("Play Bourdon Melody",0));
     // ## Waveform amplitude sliders
 	gui.add(ampSineGui.setup    ("Sine",     1.0f, 0.0f, 1.0f));
 	gui.add(ampSquareGui.setup  ("Square",   0.0f, 0.0f, 1.0f));
@@ -82,8 +81,6 @@ void ofApp::update(){
     // Update bourdonMelody if it's playing
 	if(bourdonMelodyPlaying && !melody.empty()){
 
-		std::cout << "Updating bourdon melody, current step: " << bourdonStep << std::endl;
-
 		float now = ofGetElapsedTimef();
 		float elapsed = now - bourdonStepStartTime;
 
@@ -100,7 +97,6 @@ void ofApp::update(){
 			if(idx == -1){
 				bourdonMelody.setNoteOn(false); // rest
 			} else {
-				std::cout << "Playing note index: " << idx << " (" << noteNames[idx] << ")" << std::endl;
 				bourdonMelody.setNoteOn(true);
 				bourdonMelody.setFrequency(baseFrequencies[idx]);
 			}
