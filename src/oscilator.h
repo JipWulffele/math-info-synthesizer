@@ -1,4 +1,5 @@
 #include "ofMain.h"
+#include "biquadFilter.h"
 
 class oscilator {
     public:
@@ -30,6 +31,15 @@ class oscilator {
         
         bool getNoteOn() const;
         void setNoteOn(bool value);
+
+        // Filter
+        BiquadFilter filter;
+        bool filterActive; // option pour activer/desactiver le filtre
+        void setFilterActive(bool active);
+        bool getFilterActive() const;
+        void setFilterBPF(float freq, float Q);
+        void setFilterSampleRate(float fs);
+
 
     private:
         // Attributes for the oscilator

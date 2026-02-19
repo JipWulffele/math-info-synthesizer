@@ -54,7 +54,12 @@ void ofApp::setup(){
 	bourdonGui.add(bourdonAmpTriangleGui.setup("Triangle Bourdon", 0.0f, 0.0f, 1.0f));
 	
 	bourdonGui.add(mouseToggleGui.setup("Mouse control (m)",0));
-	
+
+	// filter for bourdon
+	bourdonGui.add(bourdonFilterToggleGui.setup("Filter ON/OFF", false));
+	bourdonGui.add(bourdonFilterFreqGui.setup("Filter F0", 500.0f, 20.0f, 10000.0f));
+	bourdonGui.add(bourdonFilterQGui.setup("Filter Q", 1.0f, 0.1f, 10.0f));
+
 	// add listener
 	bourdonAmplitudeGui.addListener(this, & ofApp::onBourdonAmplitudeChanged);
 	bourdonFrequencesGui.addListener(this, & ofApp::onBourdonFrequencyChanged);
@@ -94,6 +99,17 @@ void ofApp::setup(){
 		baseFrequencies[i] = f;  // Store base frequency
 		oscillators[i].setFrequency(f);
 	}
+	
+	// add filter to bourdon
+	bourdon.setFilterSampleRate(sampleRate);
+	bourdon.setFilterActive(bourdonFilterToggleGui);
+	bourdon.setFilterBPF(bourdonFilterFreqGui, bourdonFilterQGui);
+
+	// add listener for filter info
+	bourdonFilterToggleGui.addListener(this, &ofApp::onBourdonFilterToggleChanged);
+	bourdonFilterFreqGui.addListener(this, &ofApp::onBourdonFilterFreqChanged);
+	bourdonFilterQGui.addListener(this, &ofApp::onBourdonFilterQChanged);
+
 	
 	// NOW start the audio stream after everything is initialized
 	cout << "[SETUP] About to call soundStream.setup() with bufferSize=" << bufferSize << ", sampleRate=" << sampleRate << endl;
@@ -205,6 +221,26 @@ void ofApp::draw(){
 	}
 	
 	ofEndShape(false);
+
+			//Filter affichage
+			if (bourdonFilterToggleGui)
+			{
+				ofSetColor(0, 255, 0);
+				ofSetLineWidth(2);
+
+				ofBeginShape();
+				for (unsigned int i = 0; i < audioFT.size()/2; i++)
+				{
+					float freq = ofMap(i, 0, audioFT.size()/2, 0, sampleRate/2);
+					float magnitude = bourdon.filter.getMagnitudeResponse(freq);
+
+					float x = ofMap(i, 0, audioFT.size()/2, 0, 900, true);
+					float y = 180 - magnitude * 150.0f;
+
+					ofVertex(x, y);
+				}
+				ofEndShape(false);
+			}
 			
 	ofPopMatrix();
 	ofPopStyle();
@@ -561,3 +597,15 @@ void ofApp::stopBourdonMelody(){
 	bourdonMelody.setNoteOn(false);
 }
 
+
+void ofApp::onBourdonFilterToggleChanged(bool & value){
+    bourdon.setFilterActive(value);
+}
+
+void ofApp::onBourdonFilterFreqChanged(float & value){
+    bourdon.setFilterBPF(value, bourdonFilterQGui);
+}
+
+void ofApp::onBourdonFilterQChanged(float & value){
+    bourdon.setFilterBPF(bourdonFilterFreqGui, value);
+}

@@ -29,6 +29,10 @@ class ofApp : public ofBaseApp{
 		// listeners
 		void onBourdonAmplitudeChanged(float & value);
 		void onBourdonFrequencyChanged(float & value);
+		void onBourdonFilterToggleChanged(bool & value);
+		void onBourdonFilterFreqChanged(float & value);
+		void onBourdonFilterQChanged(float & value);
+
 
 		// Variables for sound processing
 		vector <float> audioBuffer; // Buffer to hold audio samples
@@ -80,6 +84,11 @@ class ofApp : public ofBaseApp{
 		ofxFloatSlider bourdonAmpSawtoothGui;
 		ofxFloatSlider bourdonAmpTriangleGui;
 		
+		// Filter bourdon
+		ofxToggle bourdonFilterToggleGui;
+		ofxFloatSlider bourdonFilterFreqGui;
+		ofxFloatSlider bourdonFilterQGui;
+
 		// all the other oscillators
 		ofxToggle mouseToggleGui;
         // Melody

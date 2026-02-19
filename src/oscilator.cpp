@@ -36,6 +36,9 @@ oscilator::oscilator() {
     // Initialize phase adder to match target
     phaseAdder = phaseAdderTarget;
 
+    // Initialize filter
+    filterActive = false;
+    filter.setSampleRate(sampleRate);
 }
 
 // Getters and Setters with bounds enforcement
@@ -112,6 +115,15 @@ void  oscilator::get_signal(ofSoundBuffer & buffer, int n){
 
     // Always generate blended samples (envelope handles silence)
     generateBlendedSamples(buffer, n);
+
+    // Apply the filter if active
+    if(filterActive){
+        for(int i=0; i<n; i++){
+            float filtered = filter.process(buffer[i*buffer.getNumChannels() + 0]);
+            buffer[i*buffer.getNumChannels() + 0] = filtered;
+            buffer[i*buffer.getNumChannels() + 1] = filtered;
+        }
+    }
 }
 
 //--------------------------------------------------------------
@@ -258,3 +270,10 @@ void oscilator::generateBlendedSamples(ofSoundBuffer & buffer, int n){
         buffer[i*buffer.getNumChannels() + 1] = sample; // Right channel
     }
 }
+
+////--------------------------------------------------------------
+// Filter
+void oscilator::setFilterActive(bool active) {filterActive = active; }
+bool oscilator::getFilterActive() const {return filterActive; }
+void oscilator::setFilterBPF(float freq, float Q) { filter.setBPF(freq, Q); }
+void oscilator::setFilterSampleRate(float fs) { filter.setSampleRate(fs); }
