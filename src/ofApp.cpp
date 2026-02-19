@@ -33,21 +33,39 @@ void ofApp::setup(){
 
 	// setup gui Bourdon
 	gui.setup("Synth");
-	gui.add(bourdonToggleGui.setup("Activate Bourdon",0));
-	gui.add(bourdonFrequencesGui.setup("Frequence", 440.0f, 1.0f, 22050.0f));
+
+	bourdonGui.setup("Bourdon");
+	bourdonGui.setPosition(ofGetWidth()-bourdonGui.getWidth(), 10.0f);
+
+	// # Bourdon
+	bourdonGui.add(bourdonToggleGui.setup("Activate Bourdon (p)",0));
+	bourdonGui.add(bourdonFrequencesGui.setup("Frequence Bourdon", 440.0f, 1.0f, 22050.0f));
+	bourdonGui.add(bourdonAmplitudeGui.setup ("Amplitude Bourdon", 0.5f, 0.0f, 1.0f));
+	bourdonGui.add(bourdonBrillanceGui.setup ("Brillance Bourdon", 3.0f, 1.0f, 32.0f));
+    // ## Waveform amplitude sliders
+	bourdonGui.add(bourdonAmpSineGui.setup("Sine", 0.0f, 0.0f, 1.0f));
+	bourdonGui.add(bourdonAmpSquareGui.setup(  "Square   Bourdon", 1.0f, 0.0f, 1.0f));
+	bourdonGui.add(bourdonAmpSawtoothGui.setup("Sawtooth Bourdon", 0.0f, 0.0f, 1.0f));
+	bourdonGui.add(bourdonAmpTriangleGui.setup("Triangle Bourdon", 0.0f, 0.0f, 1.0f));
+	
+	bourdonGui.add(mouseToggleGui.setup("Mouse control (m)",0));
+	
+	// add listener
+	bourdonAmplitudeGui.addListener(this, & ofApp::onBourdonAmplitudeChanged);
+	bourdonFrequencesGui.addListener(this, & ofApp::onBourdonFrequencyChanged);
+
+	// # all the other oscillators mouseToggleGui;
 	gui.add(amplitudeSliderGui.setup("Amplitude", 0.5f, 0.0f, 1.0f));
-	gui.add(brillanceSliderGui.setup("Brillance", 3.0f, 1.0f, 10.0f));
+	gui.add(brillanceSliderGui.setup("Brillance", 3.0f, 1.0f, 32.0f));
 
     // Bourdon Melody
 	gui.add(playBourdonMelodyButton.setup("Play Bourdon Melody",0));
-
-    // Waveform amplitude sliders
-	gui.add(ampSineGui.setup("Sine", 1.0f, 0.0f, 1.0f));
-	gui.add(ampSquareGui.setup("Square", 0.0f, 0.0f, 1.0f));
+    // ## Waveform amplitude sliders
+	gui.add(ampSineGui.setup    ("Sine",     1.0f, 0.0f, 1.0f));
+	gui.add(ampSquareGui.setup  ("Square",   0.0f, 0.0f, 1.0f));
 	gui.add(ampSawtoothGui.setup("Sawtooth", 0.0f, 0.0f, 1.0f));
 	gui.add(ampTriangleGui.setup("Triangle", 0.0f, 0.0f, 1.0f));
-
-
+	
 	// initialisation of keyboard
 	for (int i = 0; i < 12; i++){
 		float laFreq = 440.0f;
@@ -157,6 +175,7 @@ void ofApp::draw(){
 	ofPopStyle();
 
 	gui.draw();
+	bourdonGui.draw();
 	ofFill();
 	drawKeyboard(32, 600, 900, 180);
 }
@@ -168,6 +187,20 @@ void ofApp::exit(){
 
 //--------------------------------------------------------------
 void ofApp::keyPressed(int key){
+	// float laFreq = 440.0f;
+	// int demiTon = 0;
+	// bool notePressed = false;
+
+	// toggle mouse toggle
+	if (key == 'm'){
+		mouseToggleGui=  (mouseToggleGui?false:true);
+	}
+
+	// toggle bourdon
+	if (key == 'p'){
+		bourdonToggleGui=  (bourdonToggleGui?false:true);
+	}
+	
 	// Numpad 0-9 for octave shifting
 	if (key >= '0' && key <= '9') {
 		octaveShift = key - '0';
@@ -210,7 +243,12 @@ void ofApp::keyReleased(int key){
 
 //--------------------------------------------------------------
 void ofApp::mouseMoved(int x, int y ){
-
+	if (mouseToggleGui){
+		// Update mouseX and mouseY variables with the current mouse position
+    	// Use these variables to control 'volume' and 'f' (frequency) of the sound
+		bourdonFrequencesGui = ofMap(x,0,ofGetWidth(),100,1000);
+		bourdonAmplitudeGui = ofMap(y,0,ofGetHeight(),1,0); //axe négatif
+	}
 }
 
 //--------------------------------------------------------------
@@ -228,8 +266,15 @@ void ofApp::audioOut(ofSoundBuffer & buffer){
 	}
 
 	// manage bourdon
-	bourdon.setFrequency(bourdonFrequencesGui);
+	// Note: Amplitude & Frequency are updated with listeners
+	// see ofApp::onBourdonAmplitudeChanged & ofApp::onBourdonFrequencyChanged(float & value){
 	bourdon.setNoteOn(bourdonToggleGui);
+	bourdon.setBrillance  (bourdonBrillanceGui);
+	bourdon.setAmpSine    (bourdonAmpSineGui);
+	bourdon.setAmpSquare  (bourdonAmpSquareGui);
+	bourdon.setAmpSawtooth(bourdonAmpSawtoothGui);
+	bourdon.setAmpTriangle(bourdonAmpTriangleGui);
+
 
     // Manage melody bourdon
 	if(playBourdonMelodyButton){
@@ -242,7 +287,7 @@ void ofApp::audioOut(ofSoundBuffer & buffer){
 		}
 	}
 
-    // Call cbAudioProcess to fill the buffer with sound data
+	// Call cbAudioProcess to fill the buffer with sound data
     cbAudioProcess(buffer);
 
 	// Compute the Fourier transform of the audio buffer for visualization (optional)
@@ -408,6 +453,16 @@ void ofApp::drawKeyboard(float x, float y, float width, float height)
         }
     }
 }
+
+// callback listener
+void ofApp::onBourdonAmplitudeChanged(float & value){
+	bourdon.setAmplitude(value);
+}
+
+void ofApp::onBourdonFrequencyChanged(float & value){
+	bourdon.setFrequency(value);
+}
+
 
 void ofApp::startBourdonMelody(){
     if(melody.empty()) return;

@@ -26,6 +26,10 @@ class ofApp : public ofBaseApp{
 		
 		void computeFT(vector <float> & audio); // Function to compute Fourier transform 
 
+		// listeners
+		void onBourdonAmplitudeChanged(float & value);
+		void onBourdonFrequencyChanged(float & value);
+
 		// Variables for sound processing
 		vector <float> audioBuffer; // Buffer to hold audio samples
         int sampleRate; // Sample rate for audio processing
@@ -67,15 +71,25 @@ class ofApp : public ofBaseApp{
 
 		// GUI
     	ofxPanel gui;
+    	ofxPanel bourdonGui;
+		// Bourdon
 		ofxToggle bourdonToggleGui;
 		ofxFloatSlider bourdonFrequencesGui;
+		ofxFloatSlider bourdonAmplitudeGui;
+		ofxFloatSlider bourdonBrillanceGui;
+		// Waveform amplitude for Bourdon
+		ofxFloatSlider bourdonAmpSineGui;
+		ofxFloatSlider bourdonAmpSquareGui;
+		ofxFloatSlider bourdonAmpSawtoothGui;
+		ofxFloatSlider bourdonAmpTriangleGui;
 
+		// all the other oscillators
+		ofxToggle mouseToggleGui;
         // Melody
 		ofxToggle playBourdonMelodyButton;
 
 		ofxFloatSlider brillanceSliderGui;
 		ofxFloatSlider amplitudeSliderGui;
-		ofxToggle mouseToggleGui;
 		
 		// Waveform amplitude sliders
 		ofxFloatSlider ampSineGui;
