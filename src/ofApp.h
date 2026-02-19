@@ -43,10 +43,13 @@ class ofApp : public ofBaseApp{
 
 		// setup keyboard -> 1 oscilator by note stored in oscillators
 		std::array<oscilator, 12> oscillators;
+		std::array<float, 12> baseFrequencies;  // Store base frequencies for octave shifting
+		int octaveShift = 0;  // 0 = default, 1 = +1 octave, 2 = +2 octaves, etc.
 		const std::array<std::string, 12> noteNames = {
 			"Do","Do#","Re","Re#","Mi","Fa",
 			"Fa#","Sol","Sol#","La","La#","Si"
 		};
+		void updateOctaveShift();  // Recalculate oscillator frequencies based on octaveShift
 		void drawKeyboard(float x, float y, float width, float height); // affichage clavier
 		void updateCurrentNotes(); // pour recuperer la liste des notes actives
 
