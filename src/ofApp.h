@@ -55,12 +55,22 @@ class ofApp : public ofBaseApp{
 
 		// GUI
     	ofxPanel gui;
+    	ofxPanel bourdonGui;
+		// Bourdon
 		ofxToggle bourdonToggleGui;
 		ofxFloatSlider bourdonFrequencesGui;
+		ofxFloatSlider bourdonAmplitudeGui;
+		ofxFloatSlider bourdonBrillanceGui;
+		// Waveform amplitude for Bourdon
+		ofxFloatSlider bourdonAmpSineGui;
+		ofxFloatSlider bourdonAmpSquareGui;
+		ofxFloatSlider bourdonAmpSawtoothGui;
+		ofxFloatSlider bourdonAmpTriangleGui;
 
+		// all the other oscillators
+		ofxToggle mouseToggleGui;
 		ofxFloatSlider brillanceSliderGui;
 		ofxFloatSlider amplitudeSliderGui;
-		ofxToggle mouseToggleGui;
 		
 		// Waveform amplitude sliders
 		ofxFloatSlider ampSineGui;
