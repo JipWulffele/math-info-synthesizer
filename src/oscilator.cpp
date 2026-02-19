@@ -52,6 +52,7 @@ void oscilator::setFrequency(float frequency) {
     f = clamped; 
     targetFrequency = clamped;
     phaseAdderTarget = (clamped / sampleRate) * TWO_PI;
+    phaseAdder = phaseAdderTarget;
 }
 
 // Waveform amplitude getters and setters
