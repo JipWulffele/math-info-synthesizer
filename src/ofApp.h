@@ -33,10 +33,12 @@ class ofApp : public ofBaseApp{
 		void onBourdonFilterFreqChanged(float & value);
 		void onBourdonFilterQChanged(float & value);
 
+		void onAmplitudeChanged(float & value);
+		void onBrillanceChanged(float & value);
 
 		// Variables for sound processing
 		vector <float> audioBuffer; // Buffer to hold audio samples
-        int sampleRate; // Sample rate for audio processing
+		int sampleRate; // Sample rate for audio processing
 		int bufferSize; // Size of the audio buffer
 
 		vector <float> audioFT; // Buffer to hold Fourier transform data for visualization

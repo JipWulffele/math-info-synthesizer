@@ -75,20 +75,10 @@ void ofApp::setup(){
 	gui.add(ampTriangleGui.setup("Triangle", 0.0f, 0.0f, 1.0f));
 	
 
-	// for (auto osc : oscillators){
-	// 	auto onAmplitudeChanged= [&osc](float & value){
-	// 		osc.setAmplitude(value);
-	// 	};
-
-	// 	auto onBrillanceChanged= [&osc](float & value){
-	// 		osc.setBrillance(value);
-	// 	};
-		
-	// 	//osc.setBrillance(brillanceSliderGui);
-
-	// 	amplitudeSliderGui.addListener(this, & onAmplitudeChanged);
-	// 	brillanceSliderGui.addListener(this, & onBrillanceChanged);
-	// }
+	// Note: Amplitude & Brillance for all oscillators are updated in audioOut()
+	// This is more efficient and avoids lambda scoping issues
+	amplitudeSliderGui.addListener(this, & ofApp::onAmplitudeChanged);
+	brillanceSliderGui.addListener(this, & ofApp::onBrillanceChanged);
 
 	// initialisation of keyboard
 	cout << "[SETUP] Initializing 12 oscillators" << endl;
@@ -338,7 +328,7 @@ void ofApp::audioOut(ofSoundBuffer & buffer){
 
 	for (auto & osc : oscillators){
 		osc.setBrillance(brillanceSliderGui);
-		// osc.setAmplitude(amplitudeSliderGui);
+		osc.setAmplitude(amplitudeSliderGui);
 		osc.setAmpSine(ampSineGui);
 		osc.setAmpSquare(ampSquareGui);
 		osc.setAmpSawtooth(ampSawtoothGui);
@@ -562,7 +552,7 @@ void ofApp::drawKeyboard(float x, float y, float width, float height)
     }
 }
 
-// callback listener
+// callback listeners
 void ofApp::onBourdonAmplitudeChanged(float & value){
 	bourdon.setAmplitude(value);
 	bourdonMelody.setAmplitude(value);
@@ -608,4 +598,20 @@ void ofApp::onBourdonFilterFreqChanged(float & value){
 
 void ofApp::onBourdonFilterQChanged(float & value){
     bourdon.setFilterBPF(bourdonFilterFreqGui, value);
+}
+
+void ofApp::onAmplitudeChanged(float & value){
+	// Amplitude is applied to all oscillators in audioOut()
+	// This method exists to satisfy the listener callback mechanism
+	for (auto & osc : oscillators){
+		osc.setAmplitude(value);
+	}
+}
+
+void ofApp::onBrillanceChanged(float & value){
+	// Brillance is applied to all oscillators in audioOut()
+	// This method exists to satisfy the listener callback mechanism
+	for (auto & osc : oscillators){
+		osc.setBrillance(value);
+	}
 }
