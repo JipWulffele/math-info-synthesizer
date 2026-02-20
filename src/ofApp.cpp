@@ -19,6 +19,16 @@ void ofApp::setup(){
 	audioFT.assign(bufferSize, 0.0); // Placeholder for Fourier transform buffer
 	cout << "[SETUP] Buffers allocated - audioBuffer size: " << audioBuffer.size() << ", audioFT size: " << audioFT.size() << endl;
     // Prepare audio settings but DON'T start the stream yet
+	
+	// init spectrogram
+	for (int i=0; i< nbColSpectrogram; i++){
+		vector<float> v;
+		v.assign(bufferSize, 0.0f);
+		spectrogram.push_back(v);
+	}
+
+    // Setup device and stream
+    soundStream.printDeviceList();
     ofSoundStreamSettings settings;
 
     auto devices = soundStream.getMatchingDevices("default");
@@ -259,6 +269,20 @@ void ofApp::draw(){
 	bourdonGui.draw();
 	ofFill();
 	drawKeyboard(32, 600, 900, 180);
+
+	// draw spectrogram
+	int offset=1000;
+	int xW=10;
+	int xH=10;
+	for (int t=0; t<nbColSpectrogram; t++){
+		for (int i=bufferSize; i>=0; i--){
+			int color= ofMap(spectrogram[t][i],0,1,0,255);
+			ofSetColor(color/2, color, color/2);
+			ofDrawRectangle(offset+t*xW+15,i*xH,xW,xH); 
+		}
+	}
+
+
 }
 
 //--------------------------------------------------------------
@@ -455,7 +479,7 @@ void ofApp::cbAudioProcess(ofSoundBuffer & buffer){
 
 //--------------------------------------------------------------
 // Add fourier transform function here (optional)
-void ofApp::computeFT(vector <float> & audio){
+void ofApp::computeFT(vector<float> & audio){
 	// Compute the Fourier transform of the aumyOscilator.setFormeOnde(0);dio buffer and store the result in fourierBuffer for visualization
 	
 	int n = audio.size(); // Number of samples in the audio buffer
@@ -480,6 +504,10 @@ void ofApp::computeFT(vector <float> & audio){
 		// Calculate FT magnitude and normalize by n
 		audioFT[k] = sqrt(realPart[k] * realPart[k] + imagPart[k] * imagPart[k]) / n;
 	}
+
+	// feed spectrogram
+	std::rotate(spectrogram.begin(), spectrogram.begin()+1, spectrogram.end());
+	spectrogram.back() = audioFT;
 }
 
 //--------------------------------------------------------------
