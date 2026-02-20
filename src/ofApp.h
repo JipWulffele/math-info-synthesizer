@@ -32,6 +32,10 @@ class ofApp : public ofBaseApp{
 		void onBourdonFilterToggleChanged(bool & value);
 		void onBourdonFilterFreqChanged(float & value);
 		void onBourdonFilterQChanged(float & value);
+		void onKeyboardFilterToggleChanged(bool & value);
+		void onKeyboardFilterCutoffChanged(float & value);
+		void onKeyboardFilterQChanged(float & value);
+		
 
 
 		// Variables for sound processing
@@ -88,6 +92,11 @@ class ofApp : public ofBaseApp{
 		ofxToggle bourdonFilterToggleGui;
 		ofxFloatSlider bourdonFilterFreqGui;
 		ofxFloatSlider bourdonFilterQGui;
+
+		// Keyboard filter
+		ofxToggle KeyboardFilterToggleChanged;
+		ofxFloatSlider KeyboardFilterCutoffChanged;
+		ofxFloatSlider KeyboardFilterQChanged;
 
 		// all the other oscillators
 		ofxToggle mouseToggleGui;

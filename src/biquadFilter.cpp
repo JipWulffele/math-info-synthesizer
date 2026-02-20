@@ -17,10 +17,28 @@ BiquadFilter::BiquadFilter() {
     b0 = b1 = b2 = a1 = a2 = 0.0f;
 }
 
-void BiquadFilter::setBPF(float fo, float q) {
-    
+//---------------------------------------------------------
+// fixe les propriétés des filtres
+void BiquadFilter::setBPF(float newFo, float newQ) {
+    fo = newFo;
+    Q  = newQ;
+    currentType = BPF;
+    updateBPF();
+}
+
+void BiquadFilter::setLPF(float newFo, float newQ){
+    fo = newFo;
+    Q  = newQ;
+    currentType = LPF;
+    updateLPF();
+}
+
+//---------------------------------------------------------
+// met à jour les coeff du filtre selon les paramètres du filtre
+void BiquadFilter::updateBPF() {
+
     float wo    = (TWO_PI * fo) / fs;
-    float alpha = sin(wo) / (2*q);
+    float alpha = sin(wo) / (2.0*Q);
 
     b0 =  alpha ;
     b1 =  0.0f;
@@ -31,6 +49,45 @@ void BiquadFilter::setBPF(float fo, float q) {
     a2 = 1.0f - alpha;
 }
 
+void BiquadFilter::updateLPF(){
+
+    float wo    = (TWO_PI * fo) / fs;
+    float alpha = sin(wo) / (2.0*Q);
+
+    b0 = (1 - cos(wo))/2.0 ;
+    b1 = 1 - cos(wo);
+    b2 = (1 - cos(wo))/2.0 ;
+
+    a0 = 1.0f + alpha;
+    a1 = -2.0f * cos(wo);
+    a2 = 1.0f - alpha;
+}
+
+//---------------------------------------------------------
+// setter
+void BiquadFilter::setFo(float newFo) {
+    fo = newFo;
+
+    if(currentType == LPF)
+        updateLPF();
+    else
+        updateBPF();
+}
+
+void BiquadFilter::setQ(float newQ) {
+    Q = newQ;
+
+    if(currentType == LPF)
+        updateLPF();
+    else
+        updateBPF();
+}
+//---------------------------------------------------------
+// getter
+float BiquadFilter::getFo() const { return fo; }
+float BiquadFilter::getQ()  const { return Q;  }
+
+//---------------------------------------------------------
 float BiquadFilter::process(float x) {
     float y = (b0/a0)*x + (b1/a0)*x1 + (b2/a0)*x2 - (a1/a0)*y1 - (a2/a0)*y2;
 
@@ -57,3 +114,4 @@ float BiquadFilter::getMagnitudeResponse(float freq)
 
     return std::abs(H);
 }
+

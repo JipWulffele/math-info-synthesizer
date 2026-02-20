@@ -58,7 +58,7 @@ void ofApp::setup(){
 	// filter for bourdon
 	bourdonGui.add(bourdonFilterToggleGui.setup("Filter ON/OFF", false));
 	bourdonGui.add(bourdonFilterFreqGui.setup("Filter F0", 500.0f, 20.0f, 10000.0f));
-	bourdonGui.add(bourdonFilterQGui.setup("Filter Q", 1.0f, 0.1f, 10.0f));
+	bourdonGui.add(bourdonFilterQGui.setup("Filter Q", 1.0f, 0.1f, 5.0f));
 
 	// add listener
 	bourdonAmplitudeGui.addListener(this, & ofApp::onBourdonAmplitudeChanged);
@@ -73,7 +73,16 @@ void ofApp::setup(){
 	gui.add(ampSquareGui.setup  ("Square",   0.0f, 0.0f, 1.0f));
 	gui.add(ampSawtoothGui.setup("Sawtooth", 0.0f, 0.0f, 1.0f));
 	gui.add(ampTriangleGui.setup("Triangle", 0.0f, 0.0f, 1.0f));
-	
+
+	// ## Ajout keyboard filter
+	gui.add(KeyboardFilterToggleChanged.setup("Filter ON/OFF", false));
+	gui.add(KeyboardFilterCutoffChanged.setup("Global scalling F0", 1.0f, 0.1f, 5.0f));
+	gui.add(KeyboardFilterQChanged.setup("Filter Q", 1.0f, 0.1f, 5.0f));
+
+	// ## Ajout listener for keyboard filter
+	KeyboardFilterToggleChanged.addListener(this, & ofApp::onKeyboardFilterToggleChanged);
+	KeyboardFilterCutoffChanged.addListener(this, & ofApp::onKeyboardFilterCutoffChanged);
+	KeyboardFilterQChanged.addListener(this, & ofApp::onKeyboardFilterQChanged);
 
 	// for (auto osc : oscillators){
 	// 	auto onAmplitudeChanged= [&osc](float & value){
@@ -98,6 +107,7 @@ void ofApp::setup(){
 		float f = laFreq * std::pow(2.0f, demiTon / 12.0f);
 		baseFrequencies[i] = f;  // Store base frequency
 		oscillators[i].setFrequency(f);
+		oscillators[i].setFilterLPF(f, 1);
 	}
 	
 	// add filter to bourdon
@@ -611,4 +621,23 @@ void ofApp::onBourdonFilterFreqChanged(float & value){
 
 void ofApp::onBourdonFilterQChanged(float & value){
     bourdon.setFilterBPF(bourdonFilterFreqGui, value);
+}
+
+void ofApp::onKeyboardFilterCutoffChanged(float & value){
+	for (auto & osc : oscillators){
+		float noteFreq = osc.getFrequency();
+		osc.setFilterFo(noteFreq * value);
+	}
+}
+
+void ofApp::onKeyboardFilterQChanged(float & value){
+	for (auto & osc : oscillators){
+		osc.setFilterQ(value);
+	}
+}
+
+void ofApp::onKeyboardFilterToggleChanged(bool & value){
+	for (auto & osc : oscillators){
+		osc.setFilterActive(value);
+	}
 }
