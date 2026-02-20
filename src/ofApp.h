@@ -57,6 +57,11 @@ class ofApp : public ofBaseApp{
 		void drawKeyboard(float x, float y, float width, float height); // affichage clavier
 		void updateCurrentNotes(); // pour recuperer la liste des notes actives
 
+		// spectrogram
+		static constexpr int nbColSpectrogram = 64;
+		vector<vector<float>> spectrogram;
+
+
 		// GUI
     	ofxPanel gui;
     	ofxPanel bourdonGui;
