@@ -16,9 +16,10 @@ oscilator::oscilator() {
     smoothingFactor = 0.05f; // Smoothing factor for frequency transitions
     
     // Initialize envelope attributes: smoothing volume
-    attackSamples = (int)(sampleRate / 100.0f); // 10ms attack
-    releaseSamples = (int)(sampleRate / 100.0f); // 10ms release
+    attackSamples = (int)(sampleRate / 100.0f); // 100ms attack
+    releaseSamples = (int)(sampleRate / 5.0f); // 100s release
     envelopeIncrement = 1.0f / attackSamples; // Increment per sample
+    envelopeIncrementDown = 1.0f / releaseSamples; // Increment per sample
     volumeEnvelope = 0.0f; // Start silent
     volumeTarget = 0.0f; // Target is OFF initially
     
@@ -124,6 +125,7 @@ void  oscilator::get_signal(ofSoundBuffer & buffer, int n){
             buffer[i*buffer.getNumChannels() + 1] = filtered;
         }
     }
+    
 }
 
 //--------------------------------------------------------------
@@ -225,7 +227,7 @@ void oscilator::generateBlendedSamples(ofSoundBuffer & buffer, int n){
     float cappedB = std::min(b, maxHarmonics);
 
     // Generate blended waveform samples mixing sine, square, sawtooth, and triangle
-    for (int i = 0; i < n; i++) {
+    for (int i = 0; i < n; i++) { // loop over buffer frames
         float sample = 0.0f;
 
         // Save phase state to recompute waveforms independently
@@ -256,7 +258,7 @@ void oscilator::generateBlendedSamples(ofSoundBuffer & buffer, int n){
             }
         } else if (volumeEnvelope > volumeTarget) {
             // Release: ramp down
-            volumeEnvelope -= envelopeIncrement;
+            volumeEnvelope -= envelopeIncrementDown;
             if (volumeEnvelope < volumeTarget) {
                 volumeEnvelope = volumeTarget;
             }

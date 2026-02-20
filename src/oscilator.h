@@ -72,6 +72,7 @@ class oscilator {
         int attackSamples; // Number of samples for attack (1ms)
         int releaseSamples; // Number of samples for release (1ms)
         float envelopeIncrement; // Increment per sample (1.0 / attackSamples)
+        float envelopeIncrementDown; // Increment per sample for release (1.0 / releaseSamples)
 
         // Methods to generate different waveforms (return sample value, not buffer)
         float  calc_sin_sample();
