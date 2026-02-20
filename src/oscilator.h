@@ -38,6 +38,11 @@ class oscilator {
         void setFilterActive(bool active);
         bool getFilterActive() const;
         void setFilterBPF(float freq, float Q);
+        void setFilterLPF(float freq, float Q);
+        void setFilterFo(float fo);
+        void setFilterQ(float Q);
+        float getFilterFo() const;
+        float getFilterQ() const;
         void setFilterSampleRate(float fs);
 
 

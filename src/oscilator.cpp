@@ -278,4 +278,9 @@ void oscilator::generateBlendedSamples(ofSoundBuffer & buffer, int n){
 void oscilator::setFilterActive(bool active) {filterActive = active; }
 bool oscilator::getFilterActive() const {return filterActive; }
 void oscilator::setFilterBPF(float freq, float Q) { filter.setBPF(freq, Q); }
-void oscilator::setFilterSampleRate(float fs) { filter.setSampleRate(fs); }
+void oscilator::setFilterLPF(float freq, float Q) { filter.setLPF(freq, Q); }
+void oscilator::setFilterFo(float fo) {filter.setFo(fo); }
+void oscilator::setFilterQ(float Q) {filter.setQ(Q);}
+float oscilator::getFilterFo() const {return filter.getFo();}
+float oscilator::getFilterQ() const {return filter.getQ();}
+void oscilator::setFilterSampleRate(float fs) { filter.setSampleRate(fs);}
