@@ -49,7 +49,7 @@ class ofApp : public ofBaseApp{
 		// Bourdons
 		oscilator bourdon;
 		oscilator bourdonMelody;
-		const std::vector<MelodyStep> melody = BourdonMelodies::song3;
+		const std::vector<MelodyStep> melody = BourdonMelodies::song1;
 
 		// Melody management
 		bool bourdonMelodyPlaying = false;
