@@ -324,6 +324,10 @@ void ofApp::mouseMoved(int x, int y ){
 
 //--------------------------------------------------------------
 void ofApp::audioOut(ofSoundBuffer & buffer){
+
+    // set buffer a 0 before filling it with sound data
+	buffer.set(0.0f);
+
 	static bool firstAudioCallback = true;
 	if (firstAudioCallback) {
 		cout << "[AUDIO CALLBACK] First audioOut() call - buffer size=" << buffer.size() << ", audioBuffer.size()=" << audioBuffer.size() << endl;
@@ -335,7 +339,6 @@ void ofApp::audioOut(ofSoundBuffer & buffer){
 	}
 	
 	// set Brillance based on BrillanceSliderGui
-
 	for (auto & osc : oscillators){
 		osc.setBrillance(brillanceSliderGui);
 		// osc.setAmplitude(amplitudeSliderGui);
@@ -376,13 +379,13 @@ void ofApp::audioOut(ofSoundBuffer & buffer){
 	// Call cbAudioProcess to fill the buffer with sound data
     cbAudioProcess(buffer);
 
-	// Compute the Fourier transform of the audio buffer for visualization (optional)
-	computeFT(audioBuffer);
-
 	// Copy the processed audio data to audioBuffer for visualization in the draw() function
 	for (unsigned int i = 0; i < buffer.getNumFrames(); i++){ // buffer.getNumFrames() is unsigned
 		audioBuffer[i] = buffer.getSample(i, 0); // Mono output, so we take the first channel
 	}
+
+	// Compute the Fourier transform of the audio buffer for visualization (optional)
+	computeFT(audioBuffer);	
 }
 
 //--------------------------------------------------------------
