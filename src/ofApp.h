@@ -116,6 +116,12 @@ class ofApp : public ofBaseApp{
 		ofxFloatSlider ampSquareGui;
 		ofxFloatSlider ampSawtoothGui;
 		ofxFloatSlider ampTriangleGui;
+
+		// spectrogram
+		ofxToggle activateSpectrogram;
+		ofxToggle bassFirst;
+
+		ofxIntSlider pixelHeight; 
 		
 		// Sound stream and buffer
 		ofSoundStream soundStream;
