@@ -341,7 +341,7 @@ void ofApp::audioOut(ofSoundBuffer & buffer){
 	// set Brillance based on BrillanceSliderGui
 	for (auto & osc : oscillators){
 		osc.setBrillance(brillanceSliderGui);
-		// osc.setAmplitude(amplitudeSliderGui);
+		osc.setAmplitude(amplitudeSliderGui);
 		osc.setAmpSine(ampSineGui);
 		osc.setAmpSquare(ampSquareGui);
 		osc.setAmpSawtooth(ampSawtoothGui);
